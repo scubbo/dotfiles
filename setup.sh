@@ -2,11 +2,12 @@
 sudo mkdir /localWorkspace
 cd /localWorkspace
 sudo chown jackjack:
-brazil ws --create --name AIVTitleActionPresentationService --root AIVTitleActionPresentationService
-cd AIVTitleActionPresentationService
-brazil ws --use -p AIVTitleActionPresentationService
-brazil ws --use -p AIVOfferPersonalization
-brazil ws --use -p AIVAcquisitionVendingLibrary
+# Examples here are from TAPS. Replace this with whichever packages you care about
+#brazil ws --create --name AIVTitleActionPresentationService --root AIVTitleActionPresentationService
+#cd AIVTitleActionPresentationService
+#brazil ws --use -p AIVTitleActionPresentationService
+#brazil ws --use -p AIVOfferPersonalization
+#brazil ws --use -p AIVAcquisitionVendingLibrary
 
 # Install dotfiles
 cd ~
