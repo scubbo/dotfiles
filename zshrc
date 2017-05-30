@@ -61,13 +61,19 @@ alias grhh='git reset --hard HEAD'
 alias grup='git reset --hard @{u}'
 alias guom='git branch --set-upstream-to origin/mainline'
 alias gbr='git checkout mainline; git branch -D @{-1}; git pull'
-alias bpd='brazil-build && git push && git checkout mainline && git branch -D @{-1} && git pull'
+alias gca='git commit --amend'
+alias bpd='brazil-build release && git push && git checkout mainline && git branch -D @{-1} && git pull'
 alias sqp='git sqa; git push -f'
 alias vi='vim -O'
 alias bwup='brazil ws --use -p'
 alias bbtia='brazil-build test-integration-assert'
 alias bcb='brazil-build clean && bb'
 alias cdup='cd `findup Config`'
+
+function bnuke() {
+    brazil ws --remove -p $1 && rm -rf $1
+}
+alias bnl='bnuke $(basename ~-)' # https://unix.stackexchange.com/a/3285/30828
 
 function vif() {
     vi `find . -iname "*$1*"`
