@@ -24,5 +24,9 @@ fixdel
 " Remap Shift-Enter to ESC, allowing easier exit from insert mode
 :inoremap <S-CR> <Esc>
 
+" Autowrap long lines in git commits: http://stackoverflow.com/questions/40000732/using-vim-to-wrap-git-commit-messages
+filetype indent plugin on
+au FileType gitcommit set tw=72
+
 " Auto-close xml/html tags
 "iabbrev </ </<C-X><C-O>
