@@ -16,6 +16,9 @@ export LD_LIBRARY_PATH=$ORACLE_HOME
 export JAVA_HOME=`/usr/libexec/java_home`
 eval "$(docker-machine env default)"
 
+export NVM_DIR="$HOME/.nvm"
+. "$(brew --prefix nvm)/nvm.sh"
+
 # http://stackoverflow.com/a/5257398
 DAY_OF_WEEK=$(date '+%u')
 if [ $DAY_OF_WEEK -lt 1 ] || [ $DAY_OF_WEEK -gt 5 ]
@@ -69,5 +72,40 @@ function gnb() { #Git new-branch
   git checkout --track dev/$1
 } 
 
+## AlwaysOnCluster
+alias odin="ssh -L 2009:localhost:2009 dev-cloud -f -N"
+
+# Our SSH keypair material name from odin
+material_name="com.amazon.music.datascienceplatform.sandbox.pem-na"
+
+# quick method to access our EMR cluster with ssh by fetching the keypair from odin
+setup-ssh-emr() {
+  # if the ssh-agent is not started, start it
+  if [ -z "$SSH_AUTH_SOCK" ] ; then
+    # must be called in eval not directly because of this: http://stackoverflow.com/questions/17846529/could-not-open-a-connection-to-your-authentication-agent/  4086756#4086756
+    eval `ssh-agent -s`
+  fi
+
+# fetch the keypair from odin, and add it to the ssh-agent right away. This doesn't write the keypair to disk at all
+  dir=$(mktemp -d $TMPDIR/setup-emr-XXXX) || exit 1
+  fifo=${dir}/pem
+  mkfifo -m 0600 $fifo || { rmdir $dir; exit 1; }
+  wget "http://localhost:2009/query?Operation=retrieve&ContentType=JSON&material.materialName=${material_name}&material.materialType=PrivateKey" --quiet -O - \
+   | tr '{},' '\n\n\n' \
+   | sed -n 's/"materialData":"\(.*\)"/\1/p' \
+   | base64 -D \
+   | openssl pkcs8 -nocrypt -inform DER -outform PEM > $fifo \
+   | ssh-add $fifo
+  rm -f $fifo && rmdir $dir
+}
+
+# Force update of quarantine policy - see https://tt.amazon.com/0096736527
+update-quarantine() {
+  sudo jamf flushPolicyHistory
+  sudo jamf policy
+  sudo /usr/local/amazon/bin/quarantine evaluate 
+}
+
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
 source ~/.env/zshrc
