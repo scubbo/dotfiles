@@ -36,7 +36,7 @@ zle -N edit-command-line
 bindkey -M vicmd v edit-command-line
 
 # less options ;)
-export LESS="-i"
+export LESS="-iR"
 
 bindkey '\e[1~'   beginning-of-line  # Linux console
 bindkey '\e[H'    beginning-of-line  # xterm
