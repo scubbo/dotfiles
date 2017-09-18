@@ -1,7 +1,7 @@
 # Set up workspace
 sudo mkdir /localWorkspace
 cd /localWorkspace
-sudo chown jackjack:
+sudo chown jackjack: .
 # Examples here are from TAPS. Replace this with whichever packages you care about
 #brazil ws --create --name AIVTitleActionPresentationService --root AIVTitleActionPresentationService
 #cd AIVTitleActionPresentationService
