@@ -37,3 +37,5 @@ cd /tmp
 curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
 unzip awscli-bundle.zip
 sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+
+echo "Now go to https://w.amazon.com/index.php/BrazilCLI_2.0/GettingStarted to install Brazil"
