@@ -42,3 +42,5 @@ echo "Now go to https://w.amazon.com/index.php/BrazilCLI%202.0/Runtimes/Java to 
 echo "Now go to https://w.amazon.com/index.php/BrazilCLI_2.0/GettingStarted to install Brazil"
 echo "Not go to https://github.com/tonsky/FiraCode to install FiraCode"
 echo "Now install IntelliJ - set Fira to the font (Editor -> Font)"
+echo "Now go to https://w.amazon.com/index.php/BuilderTools/Product/CodeBrowser/CRUX and install CRUX"
+echo "Now go to https://www.dropbox.com and install Dropbow"
