@@ -17,6 +17,7 @@ ln -s dotfiles/zshrc .zshrc
 ln -s dotfiles/zshrc-local-mactop .zshrc-local
 ln -s dotfiles/gitignore_global .gitignore_global
 ln -s dotfiles/gitconfig .gitconfig
+ln -s dotfiles/gitconfig-work .gitconfig-work
 ln -s dotfiles/vimrc .vimrc
 ln -s dotfiles/envFolder .env
 ln -s dotfiles/bin bin
