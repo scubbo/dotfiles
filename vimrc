@@ -28,5 +28,10 @@ fixdel
 filetype indent plugin on
 au FileType gitcommit set tw=72
 
+
+" https://kinbiko.com/vim/my-shiniest-vim-gems/
+match ErrorMsg '\%>120v.\+'
+match ErrorMsg '\s\+$'
+
 " Auto-close xml/html tags
 "iabbrev </ </<C-X><C-O>
