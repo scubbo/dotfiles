@@ -6,8 +6,10 @@ alias stis='open build/brazil-integ-tests/index.html'
 alias chks='open build/brazil-documentation/checkstyle/checkstyle_report.html'
 alias fbgs='open build/brazil-documentation/findbugs/findbugs_report.html'
 alias post-review='post-review --target-group=amazon-music-metrics-team -o'
+alias bcrs='brazil-build clean && brazil-build release && brazil-build server'
+alias bcr='brazil-build clean && brazil-build release'
 
-export PATH="/apollo/env/ruby193/bin:/apollo/env/SDETools/bin:$PATH:/Users/jackjack/bin:/Users/jackjack/development/sbt/bin:/Users/jackjack/Development/gradle-2.14/bin"
+export PATH="/apollo/env/ruby193/bin:/apollo/env/SDETools/bin:$PATH:/Users/jackjack/bin:/usr/local/sbin:/Users/jackjack/development/sbt/bin:/Users/jackjack/Development/gradle-2.14/bin:$HOME/.toolbox/bin"
 
 export ORACLE_VERSION=11.2.2
 export ORACLE_HOME="/Users/jackjack/Development/oracle/instantclient_11_2_2"
