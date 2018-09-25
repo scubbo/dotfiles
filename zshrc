@@ -62,7 +62,13 @@ alias grup='git reset --hard @{u}'
 alias guom='git branch --set-upstream-to origin/mainline'
 alias gbr='git checkout mainline; git branch -D @{-1}; git pull'
 alias gca='git commit --amend'
-alias bpd='brazil-build release && git push && git checkout mainline && git branch -D @{-1} && git pull'
+function bpd() {
+  if git diff-index --quiet HEAD --; then
+    brazil-build release && git push && git checkout mainline && git branch -D @{-1} && git pull;
+  else
+    echo "You have uncommitted files. Aborting";
+  fi
+}
 alias sqp='git sqa; git push -f'
 alias vi='vim -O'
 alias bwup='brazil ws --use -p'
