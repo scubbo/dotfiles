@@ -22,27 +22,16 @@ ln -s dotfiles/vimrc .vimrc
 ln -s dotfiles/envFolder .env
 ln -s dotfiles/bin bin
 
-# Install ReviewBoard - https://w.amazon.com/index.php/BuilderTools/Product/ReviewBoard/UserGuide/Mac
-sudo easy_install pip
-sudo pip install setuptools --no-use-wheel --upgrade
-sudo pip install urllib2_kerberos
-sudo pip install simplejson
-sudo pip install kerberos
-cd /tmp
-git clone -b RBTools-0.5 ssh://git.amazon.com:2222/pkg/RBTools
-cd RBTools
-sudo python setup.py install
-
 # Install AWS CLI - http://docs.aws.amazon.com/cli/latest/userguide/installing.html#install-bundle-other-os
 cd /tmp
 curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
 unzip awscli-bundle.zip
 sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 
-echo "Now go to https://w.amazon.com/index.php/BrazilCLI%202.0/Runtimes/Java to install Java"
-echo "Now go to https://w.amazon.com/index.php/BrazilCLI_2.0/GettingStarted to install Brazil"
+echo "Now go to https://tiny.amazon.com/zigp89oi/ to install Java"
+echo "Now go to https://tiny.amazon.com/1b2yj1y5p/ to install Brazil"
 echo "Not go to https://github.com/tonsky/FiraCode to install FiraCode"
 echo "Now install IntelliJ - set Fira to the font (Editor -> Font)"
-echo "Now go to https://w.amazon.com/index.php/BuilderTools/Product/CodeBrowser/CRUX and install CRUX"
+echo "Now go to https://tiny.amazon.com/apzht95n and install CRUX"
 echo "Now go to https://www.dropbox.com and install Dropbow"
-echo "Now go to https://w.amazon.com/index.php/Amazon_Music/Metrics/Connecting_To_Redshift and set up connections to Redshift"
+echo "Now go to https://tiny.amazon.com/lxgan6i9 and set up connections to Redshift"
