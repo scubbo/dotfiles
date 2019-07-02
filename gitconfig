@@ -1,8 +1,8 @@
 [user]
 	name = Jack Jackson
 	email = scubbojj@gmail.com
-[includeIf "gitdir:/localWorkspace"]
-    path = .gitconfig-work
+[includeIf "gitdir:/localWorkspace/"]
+    path = ~/.gitconfig-work
 [push]
 	default = upstream
 [core]
