@@ -109,6 +109,10 @@ update-quarantine() {
   sudo /usr/local/amazon/bin/quarantine evaluate 
 }
 
+# https://builderhub.corp.amazon.com/docs/rde/cli-guide/setup-post.html
+fpath=(~/.zsh/completion $fpath)
+autoload -Uz compinit && compinit -i
+
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
 source ~/.env/zshrc
