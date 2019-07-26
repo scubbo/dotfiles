@@ -10,6 +10,7 @@
 	excludesfile = ~/.gitignore_global
     fileMode = false
     autocrlf = input
+	editor = vim
 [alias]
 	lg = log --format=format:'%C(yellow)%h%Creset %Cred%an%Creset %s' -5
 	co = checkout
@@ -19,6 +20,7 @@
 	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
     hb = log --graph --pretty=format:'%Cred%h%Creset - %s %C(bold blue)<%an>%Creset %Cgreen(%cr) %C(yellow)%d%Creset' --abbrev-commit --date=relative --branches
     bu = reset --hard HEAD^
+    kts = branch -D @{-1}
 [pull]
 	rebase = true
 [color]
