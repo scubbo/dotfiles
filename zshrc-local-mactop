@@ -30,7 +30,7 @@ else
     then
         cd ~/Code
     else
-        cd /localWorkspace/MusicMetricsRtecLive/src
+        cd /Users/jackjack/casesafe/workspace/RtecLive/src
     fi
 fi
 
