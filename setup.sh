@@ -1,13 +1,6 @@
+# Set up case-sensitive workspace, as per https://w.amazon.com/bin/view/MacImprovement/CaseSensitiveVolume/#Use_APFS.2C_Recommended_.28Available_since_macOS_10.13_High_Sierra.29
 # Set up workspace
-sudo mkdir /localWorkspace
-cd /localWorkspace
-sudo chown jackjack: .
-# Examples here are from TAPS. Replace this with whichever packages you care about
-#brazil ws --create --name AIVTitleActionPresentationService --root AIVTitleActionPresentationService
-#cd AIVTitleActionPresentationService
-#brazil ws --use -p AIVTitleActionPresentationService
-#brazil ws --use -p AIVOfferPersonalization
-#brazil ws --use -p AIVAcquisitionVendingLibrary
+# Set up platform overlay like so: https://w.amazon.com/index.php/BrazilCLI_2.0/PlatformSupport
 
 # Install dotfiles
 cd ~
