@@ -62,7 +62,6 @@ alias stis="cd build/brazil-integ-tests; python -m SimpleHTTPServer 8888; cd ../
 alias chks="cd build/brazil-documentation/checkstyle; python -m SimpleHTTPServer 8888; cd ../../.."
 alias fbgs="cd build/brazil-documentation/findbugs; python -m SimpleHTTPServer 8889; cd ../../.."
 alias chks="cd build/brazil-documentation/checkstyle; python -m SimpleHTTPServer 8890; cd ../../.."
-alias post-review='post-review --target-group=dv-purchasing --random-reviewers=dv-purchasing'
 alias gcr="git reset --hard HEAD; bb clean && bb release"
 
 #jruby aliases
