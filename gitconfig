@@ -1,8 +1,10 @@
 [user]
 	name = Jack Jackson
 	email = scubbojj@gmail.com
-[includeIf "gitdir:/Users/jackjack/casesafe/"]
-    path = ~/.gitconfig-work
+[includeIf "gitdir:/Users/jackjack/workspace/"]
+    path = /Users/jackjack/.gitconfig-work
+[includeIf "gitdir:/Volumes/workspace/"]
+    path = /Users/jackjack/.gitconfig-work
 [push]
 	default = upstream
 [core]
@@ -34,3 +36,5 @@
 	windowMemory = 100m
 	SizeLimit = 100m
 	threads = 1
+[diff]
+    noprefix = true
