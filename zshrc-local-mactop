@@ -67,8 +67,10 @@ function pat { #pushAndTest
 function gnb() { #Git new-branch
   git fetch dev;
   git checkout --track dev/$1
-} 
+}
 
+# Devcloud Tunnel
+alias dt="ssh jackjack@dev-cloud -N -R localhost:2000:localhost:22"
 ## AlwaysOnCluster
 alias odin="ssh -L 2009:localhost:2009 dev-cloud -f -N"
 function odin-get() {
