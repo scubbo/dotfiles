@@ -77,7 +77,7 @@ alias bwup='brazil ws --use -p'
 alias bbtia='brazil-build test-integration-assert'
 alias bcb='brazil-build clean && bb'
 alias cdup='cd `findup Config`'
-alias lcm='git log -1 --pretty %B | grep -v "^cr" | pbcopy'
+alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
 alias bre='brazil-runtime-exec'
 
 
