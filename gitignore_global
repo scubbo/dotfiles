@@ -26,3 +26,6 @@ gradle/
 gradlew.bat
 out/
 cdk.out/
+
+Pipfile
+Pipfile.lock
