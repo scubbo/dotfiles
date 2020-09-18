@@ -27,7 +27,7 @@ else
     then
         cd ~/Code
     else
-        cd /Users/jackjack/workspace/RtecLive/src
+        cd /Users/jackjack/workplace
     fi
 fi
 
