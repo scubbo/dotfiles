@@ -40,6 +40,8 @@ echo "Install the Amazon tap"
 brew tap amazon/amazon "ssh://git.amazon.com/pkg/HomebrewAmazon"
 echo "And NinjaDevSync"
 brew install ninja-dev-sync
+echo "And watch"
+brew install watch
 
 
 echo "Creating case-Sensitive Volumes"
