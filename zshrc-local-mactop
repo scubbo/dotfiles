@@ -8,7 +8,7 @@ alias fbgs='open build/brazil-documentation/findbugs/findbugs_report.html'
 alias bcrs='brazil-build clean && brazil-build release && brazil-build server'
 alias bcr='brazil-build clean && brazil-build release'
 alias bbr='brazil-recursive-cmd --recAllDeps brazil-build release'
-export PATH="/apollo/env/ruby193/bin:/apollo/env/SDETools/bin:$PATH:/Users/jackjack/bin:/usr/local/sbin:/Users/jackjack/development/sbt/bin:/Users/jackjack/Development/gradle-2.14/bin:$HOME/.toolbox/bin"
+export PATH="/Users/jackjack/Library/Python/3.7/bin:/apollo/env/ruby193/bin:/apollo/env/SDETools/bin:$PATH:/Users/jackjack/bin:/usr/local/sbin:/Users/jackjack/development/sbt/bin:/Users/jackjack/Development/gradle-2.14/bin:$HOME/.toolbox/bin"
 
 export ORACLE_VERSION=11.2.2
 export ORACLE_HOME="/Users/jackjack/Development/oracle/instantclient_11_2_2"
