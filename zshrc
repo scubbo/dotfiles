@@ -125,6 +125,10 @@ psearch () {
 #	popd $1 > /dev/null
 #}
 
+savessh() {
+  eval `ssh-agent -s`
+  ssh-add ~/.ssh/id_rsa
+}
 
 echo "\n\nHERE IS A PICTURE OF A CAT:\n"
 # http://stackoverflow.com/a/677212/1040915
