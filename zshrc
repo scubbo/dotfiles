@@ -79,6 +79,9 @@ alias bcb='brazil-build clean && bb'
 alias cdup='cd `findup Config`'
 alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
 alias bre='brazil-runtime-exec'
+# https://apple.stackexchange.com/questions/110343/copy-last-command-in-terminal -
+# `echo "!!" | pbcopy` works on command line, but not from zshrc (copies literal "!!")
+alias copylast='fc -ln -1 | awk '{$1=$1}1' | pbcopy '
 
 
 function bnuke() {
