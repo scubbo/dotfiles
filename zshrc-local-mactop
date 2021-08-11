@@ -113,6 +113,22 @@ bab() { # Build and (come) back
   cd $1 && brazil-build clean && brazil-build release && cd - && brazil-build clean && brazil-build release
 }
 
+notif() {
+  osascript -e \
+    'on run argv
+      display notification (item 1 of argv) with title "Notification"
+     end run' \
+    $1
+}
+
+alert() {
+  osascript -e \
+    'on run argv
+      display alert "Alert" message (item 1 of argv)
+     end run' \
+    $1
+}
+
 
 # https://builderhub.corp.amazon.com/docs/rde/cli-guide/setup-post.html
 fpath=(~/.zsh/completion $fpath)
