@@ -141,4 +141,8 @@ export VISUAL=vim
 autoload edit-command-line; zle -N edit-command-line
 bindkey -M vicmd v edit-command-line
 
+# ssh-agent setup
+eval "$(ssh-agent -s)"
+ssh-add -K ~/.ssh/id_rsa
+
 source ~/.env/zshrc
