@@ -31,6 +31,8 @@ set colorcolumn=+1
 autocmd FileType gitcommit set formatoptions+=wq
 autocmd FileType gitcommit set formatoptions-=l
 autocmd FileType gitcommit set nopaste
+" Setting this again because it seemed to not take effect from line 29?
+autocmd FileType gitcommit set textwidth=72
 
 
 " https://kinbiko.com/vim/my-shiniest-vim-gems/
