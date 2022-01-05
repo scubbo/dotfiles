@@ -38,3 +38,4 @@
 	threads = 1
 [diff]
     noprefix = true
+    wsErrorHighlight = all
