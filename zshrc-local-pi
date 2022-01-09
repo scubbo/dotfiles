@@ -1,0 +1,3 @@
+# Created with https://stackoverflow.com/a/68797795/1040915 and Digital Color Picker
+PS1="%B%F{#50F862}%n@%m%f%b:%B%F{#625EF6}%~ %#%f%b "
+
