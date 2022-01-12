@@ -1,3 +1,10 @@
+# Auto-start a screen session
+# https://superuser.com/questions/580087/automatically-start-screen-upon-ssh-login
+if [[ -z "$STY" ]]; then # TODO - add an env variable escape hatch so you can open a "bare" terminal if desired
+  # https://stackoverflow.com/questions/10599769/attach-to-screen-session-with-creating-a-new-screen-window
+  screen -D -RR -p +; # Create if none exists, then attach, opening a new tab
+fi
+
 # Created with https://stackoverflow.com/a/68797795/1040915 and Digital Color Picker
 PS1='%B%F{green}%n@%m%f%b:%B%F{blue}%~ %#%f%b '
 
@@ -10,3 +17,4 @@ if [ $(ps ax | grep "[s]sh-agent" | wc -l) -eq 0 ] ; then
         ssh-add ~/.ssh/id_rsa > /dev/null 2>&1
     fi
 fi
+
