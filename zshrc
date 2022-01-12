@@ -134,7 +134,7 @@ savessh() {
   ssh-add ~/.ssh/id_rsa
 }
 
-echo "\n\nHERE IS A PICTURE OF A CAT:\n"
+echo "\nHERE IS A PICTURE OF A CAT:\n"
 # http://stackoverflow.com/a/677212/1040915
 if hash cat-art 2>/dev/null; then
   cat-art
