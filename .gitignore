@@ -1,0 +1,4 @@
+# Override the usual `.gitignore_global` - we _do_ want to track changes in `bin/`!
+!bin/
+# ...but, don't track `bin/subl`, since that is an OS (Mac)-specific symlink
+bin/subl
