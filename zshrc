@@ -134,15 +134,6 @@ savessh() {
   ssh-add ~/.ssh/id_rsa
 }
 
-echo "\nHERE IS A PICTURE OF A CAT:\n"
-# http://stackoverflow.com/a/677212/1040915
-if hash cat-art 2>/dev/null; then
-  cat-art
-else
-  echo "You do not have cat-art installed, you heathen!"
-fi
-echo ""
-
 # Work on this shortcut: git status --porcelain | sed -ne 's/^ M //p' | tr '\n' '\0' | xargs -0 vi
 
 ENV_ZSHRC=~/.env/zshrc # Env setup provided by Amazon
@@ -158,3 +149,14 @@ PERL_MM_OPT="INSTALL_BASE=/Users/jackjack/perl5"; export PERL_MM_OPT;
 
 # Use curl from Homebrew
 export PATH=/usr/local/opt/curl/bin:$PATH
+# And bin from homeir
+export PATH=$HOME/bin:$PATH
+
+echo "\nHERE IS A PICTURE OF A CAT:\n"
+# http://stackoverflow.com/a/677212/1040915
+if hash cat-art 2>/dev/null; then
+  cat-art
+else
+  echo "You do not have cat-art installed, you heathen!"
+fi
+echo ""
