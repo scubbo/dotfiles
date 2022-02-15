@@ -66,7 +66,14 @@ alias gca='git commit --amend'
 alias mau='git checkout mainline && git branch -D @{-1} && git pull'
 function bpd() {
   if git diff-index --quiet HEAD --; then
-    brazil-build release && git push && mau;
+    # Check if we are behind upstream _first_, before building
+    git fetch;
+    if [[ $(git status --porcelain --branch | perl -pe 's/.*\[(.*)\].*/$1/') == *"behind"* ]]; then
+      echo "Current branch is behind upstream. This script will now exit";
+      return 1;
+    else
+      brazil-build release && git push && mau;
+    fi
   else
     echo "You have uncommitted files. Aborting";
   fi
