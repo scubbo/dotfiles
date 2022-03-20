@@ -167,3 +167,5 @@ else
   echo "You do not have cat-art installed, you heathen!"
 fi
 echo ""
+
+source $HOME/bin/indexed-funcs.zsh
