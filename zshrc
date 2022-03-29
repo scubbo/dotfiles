@@ -53,7 +53,6 @@ function pskill() {
 }
 alias exist="echo 'Do I really need to be told to exist?\nI choose not to. Exiting in 3...';sleep 1;echo '2...';sleep 1;echo '1...';sleep 1;echo 'Goodbye cruel world';exit"
 alias loglist="ls | perl -pe 's/(.*?)\..*/$1/g' | uniq"
-alias ff="clear; tail -fn0"
 alias svi='sudo -E vi'
 alias pyserv='python -m SimpleHTTPServer'
 alias please='sudo'
