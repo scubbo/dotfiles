@@ -20,8 +20,7 @@ declare -A defs=(
 # https://unix.stackexchange.com/a/287333/30828
 randomlyChosenFunction=$funcs[$(( $RANDOM % ${#funcs[@]} + 1 ))]
 echo "Random function to try today is:"
-echo "$randomlyChosenFunction"
-echo "DOCS: $docs[$randomlyChosenFunction]"
+echo -e "\033[1m$randomlyChosenFunction\033[0m: $docs[$randomlyChosenFunction]"
 
 
 for func in $funcs
