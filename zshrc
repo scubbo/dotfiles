@@ -57,7 +57,6 @@ alias pyserv='python -m SimpleHTTPServer'
 alias please='sudo'
 alias guom='git branch --set-upstream-to origin/mainline'
 alias gbr='git checkout mainline; git branch -D @{-1}; git pull'
-alias gca='git commit --amend'
 # (to)Mainline-And-Update
 alias mau='git checkout mainline && git branch -D @{-1} && git pull'
 function bpd() {
