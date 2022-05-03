@@ -47,7 +47,6 @@ bindkey '\e[4~'   end-of-line        # Linux console
 bindkey '\e[F'    end-of-line        # xterm
 bindkey '\eOF'    end-of-line        # gnome-terminal
 
-alias psgrep="ps aux | grep -v 'grep' | grep -i "
 function pskill() {
     psgrep $1 | perl -pe 's/\S*\s*(\S*).*/$1/' | xargs kill -9
 }
