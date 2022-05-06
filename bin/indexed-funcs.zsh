@@ -1,5 +1,5 @@
 # https://stackoverflow.com/a/49105399/1040915
-declare -a funcs=(tabname ff grhh grup gca psgrep)
+declare -a funcs=(tabname ff grhh grup gca psgrep dps)
 # AFAIK, there's no way to ensure that these "associative arrays"
 # (Dictionaries, basically) have key-sets that match `funcs` -
 # nor have I figured out how to do the obvious thing of
@@ -12,6 +12,7 @@ declare -A docs=(
     [grup]="Git Reset to UPstream"
     [gca]="Git Commit Amend (update most recent commit's message)"
     [psgrep]="Grep through ps"
+    [dps]="Docker ps (pretty-formatted)"
 )
 
 declare -A defs=(
@@ -21,6 +22,7 @@ declare -A defs=(
     [grup]="git reset --hard @{u}"
     [gca]="git commit --amend"
     [psgrep]='ps aux | grep -i $1 | grep -v "grep"'
+    [dps]="docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'"
 )
 
 # https://unix.stackexchange.com/a/287333/30828
