@@ -1,6 +1,9 @@
 # Created with https://stackoverflow.com/a/68797795/1040915 and Digital Color Picker
 PS1='%B%F{green}%n@%m%f%b:%B%F{blue}%~ %#%f%b '
 
+# https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
 # https://www.tomaszmik.us/2020/09/21/auto-start-ssh-agent-zsh/
 if [ $(ps ax | grep "[s]sh-agent" | wc -l) -eq 0 ] ; then
     eval $(ssh-agent -s) > /dev/null
