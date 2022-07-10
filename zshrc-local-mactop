@@ -141,18 +141,37 @@ autoload -Uz compinit && compinit -i
 
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
-# Allows you to press `<Esc>,v` to edit the current line in vim
-# Article which helped me understand (and fix) this: https://thevaluable.dev/zsh-line-editor-configuration-mouseless/
+###
+# ZLE configuration
+###
+
+# Article which helped me understand the ZLE: https://thevaluable.dev/zsh-line-editor-configuration-mouseless/
 #
 # See https://stackoverflow.com/questions/14598261/making-sublime-text-2-command-on-linux-behave-as-it-does-on-macos-x
 # if you really want to use Sublime as an environment-linked editor, though note it will probably lead to other
 # use-cases (like this one, or Git editing) opening Sublime unexpectedly
 #
 # TODO: add an indicator of mode: https://unix.stackexchange.com/questions/547/make-my-zsh-prompt-show-mode-in-vi-mode
-export VISUAL=vim # Necessary because the `edit-command-line` widget references $VISUAL
+
+# Allows you to press `<Esc>,v` to edit the current line in vim
 autoload edit-command-line; zle -N edit-command-line
 bindkey -M vicmd v edit-command-line
+export VISUAL=vim # Necessary because the `edit-command-line` widget references $VISUAL
+
+# Without this, you will not be able to backspace characters after returning from `edit-command-line`:
+# see https://unix.stackexchange.com/a/290403/30828
+bindkey -M viins '^?' backward-delete-char
+
+# Borrow my favourite shortcuts from Emacs mode
+bindkey -M viins '^A' beginning-of-line
+bindkey -M viins '^E' end-of-line
+bindkey -M viins '^U' kill-whole-line
+
 bindkey -v # Set default keybinding to VIINS
+
+###
+# End ZLE configuration
+###
 
 # ssh-agent setup
 eval "$(ssh-agent -s)"
