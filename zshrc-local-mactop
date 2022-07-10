@@ -13,6 +13,7 @@ export PATH="/Users/jackjack/sdk/go1.18/bin:/Users/jackjack/Library/Python/3.7/b
 # https://stackoverflow.com/a/56639316/1040915
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export CDPATH="/Users/jackjack/workplace:/."
+export VISUAL=subl
 
 export ORACLE_VERSION=11.2.2
 export ORACLE_HOME="/Users/jackjack/Development/oracle/instantclient_11_2_2"
@@ -142,7 +143,9 @@ autoload -Uz compinit && compinit -i
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
 # Allows you to press `<Esc>,v` to edit the current line in vim
-export VISUAL=vim
+# Note - this block originally included `export VISUAL=vim` as the first line (which was moved
+# to the export block near the top and changed to point at `subl`) - but, upon testing, this
+# shell functionality appeared to not be working with the then-current setup anyway.
 autoload edit-command-line; zle -N edit-command-line
 bindkey -M vicmd v edit-command-line
 
