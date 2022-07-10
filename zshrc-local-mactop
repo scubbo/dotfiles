@@ -13,7 +13,6 @@ export PATH="/Users/jackjack/sdk/go1.18/bin:/Users/jackjack/Library/Python/3.7/b
 # https://stackoverflow.com/a/56639316/1040915
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export CDPATH="/Users/jackjack/workplace:/."
-export VISUAL=subl
 
 export ORACLE_VERSION=11.2.2
 export ORACLE_HOME="/Users/jackjack/Development/oracle/instantclient_11_2_2"
@@ -143,11 +142,17 @@ autoload -Uz compinit && compinit -i
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
 # Allows you to press `<Esc>,v` to edit the current line in vim
-# Note - this block originally included `export VISUAL=vim` as the first line (which was moved
-# to the export block near the top and changed to point at `subl`) - but, upon testing, this
-# shell functionality appeared to not be working with the then-current setup anyway.
+# Article which helped me understand (and fix) this: https://thevaluable.dev/zsh-line-editor-configuration-mouseless/
+#
+# See https://stackoverflow.com/questions/14598261/making-sublime-text-2-command-on-linux-behave-as-it-does-on-macos-x
+# if you really want to use Sublime as an environment-linked editor, though note it will probably lead to other
+# use-cases (like this one, or Git editing) opening Sublime unexpectedly
+#
+# TODO: add an indicator of mode: https://unix.stackexchange.com/questions/547/make-my-zsh-prompt-show-mode-in-vi-mode
+export VISUAL=vim # Necessary because the `edit-command-line` widget references $VISUAL
 autoload edit-command-line; zle -N edit-command-line
 bindkey -M vicmd v edit-command-line
+bindkey -v # Set default keybinding to VIINS
 
 # ssh-agent setup
 eval "$(ssh-agent -s)"
