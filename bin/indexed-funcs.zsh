@@ -1,5 +1,5 @@
 # https://stackoverflow.com/a/49105399/1040915
-declare -a funcs=(tabname ff grhh grup gca psgrep dps kc)
+declare -a funcs=(tabname ff grhh grup gca psgrep dps kc token)
 # AFAIK, there's no way to ensure that these "associative arrays"
 # (Dictionaries, basically) have key-sets that match `funcs` -
 # nor have I figured out how to do the obvious thing of
@@ -14,6 +14,7 @@ declare -A docs=(
     [psgrep]="Grep through ps"
     [dps]="Docker ps (pretty-formatted)"
     [kc]="KubeCtl"
+    [token]="Copy Kubernetes Dashboard token"
 )
 
 declare -A defs=(
@@ -25,6 +26,7 @@ declare -A defs=(
     [psgrep]='ps aux | grep -i $1 | grep -v "grep"'
     [dps]="docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'"
     [kc]="kubectl"
+    [token]=$'kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" | pbcopy'
 )
 
 # https://unix.stackexchange.com/a/287333/30828
