@@ -47,3 +47,5 @@
 [diff]
     noprefix = true
     wsErrorHighlight = all
+[init]
+	defaultBranch = main
