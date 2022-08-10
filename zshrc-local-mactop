@@ -9,7 +9,7 @@ alias bcrs='brazil-build clean && brazil-build release && brazil-build server'
 alias bcr='brazil-build clean && brazil-build release'
 alias bbr='brazil-recursive-cmd --recAllDeps brazil-build release'
 alias nds='ninja-dev-sync'
-export PATH="/Users/jackjack/sdk/go1.18/bin:/Users/jackjack/Library/Python/3.7/bin:/apollo/env/ruby193/bin:/apollo/env/SDETools/bin:$PATH:/Users/jackjack/bin:/usr/local/sbin:/Users/jackjack/development/sbt/bin:/Users/jackjack/Development/gradle-2.14/bin:$HOME/.toolbox/bin"
+export PATH="/Users/jackjack/sdk/go1.18/bin:/Users/jackjack/Library/Python/3.7/bin:/apollo/env/ruby193/bin:/apollo/env/SDETools/bin:$PATH:/Users/jackjack/bin:/usr/local/sbin:/Users/jackjack/development/sbt/bin:/Users/jackjack/Development/gradle-2.14/bin:$HOME/.toolbox/bin:/Applications/Sublime Text.app/Contents/SharedSupport/bin"
 # https://stackoverflow.com/a/56639316/1040915
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export CDPATH="/Users/jackjack/workplace:/."
