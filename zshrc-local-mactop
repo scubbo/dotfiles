@@ -166,6 +166,7 @@ bindkey -M viins '^?' backward-delete-char
 # Borrow my favourite shortcuts from Emacs mode
 bindkey -M viins '^A' beginning-of-line
 bindkey -M viins '^E' end-of-line
+bindkey -M viins '^R' history-incremental-search-backward
 bindkey -M viins '^U' kill-whole-line
 
 bindkey -v # Set default keybinding to VIINS
