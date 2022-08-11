@@ -175,8 +175,4 @@ bindkey -v # Set default keybinding to VIINS
 # End ZLE configuration
 ###
 
-# ssh-agent setup
-eval "$(ssh-agent -s)"
-ssh-add -K ~/.ssh/id_rsa
-
 source ~/.env/zshrc
