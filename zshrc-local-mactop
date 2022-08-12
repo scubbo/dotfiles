@@ -34,7 +34,8 @@ else
     then
         cd ~/Code
     else
-        cd /Users/jackjack/workplace
+        echo "You're currently unemployed, no need to cd to workplace!"
+        cd ~/Code
     fi
 fi
 
