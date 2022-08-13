@@ -176,4 +176,7 @@ bindkey -v # Set default keybinding to VIINS
 # End ZLE configuration
 ###
 
-source ~/.env/zshrc
+ENV_ZSHRC="${HOME}/.env/zshrc"
+if [[ -f "$ENV_ZSHRC" ]]; then
+  source "$ENV_ZSHRC"
+fi
