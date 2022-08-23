@@ -21,6 +21,7 @@ ln -s ~/Code/dotfiles/gitconfig $HOME/.gitconfig
 ln -s ~/Code/dotfiles/vimrc $HOME/.vimrc
 ln -s ~/Code/dotfiles/envFolder $HOME/.env
 ln -s ~/Code/dotfiles/bin $HOME/bin
+ln -s ~/Code/dotfiles/screenrc $HOME/.screenrc
 
 echo "Dotfiles installed. Now to give you some tools!"
 
