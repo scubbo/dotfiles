@@ -26,31 +26,12 @@ if [[ -z $PROMPT_CORE ]]; then
 fi
 
 source $SCRIPT_DIR/zsh/git.zsh
-source $SCRIPT_DIR/zsh/brazil.zsh
 
 setopt prompt_subst
 
-#Original
-#function get_prompt() {
-#    echo -n "["
-#    echo -n "%{$fg[yellow]%}$(brazil_workspace_dir)%{$reset_color%}"
-#    echo -n ":"
-#    echo -n "%{$fg[magenta]%}%B$(brazil_package)%b%{$reset_color%}"
-#    echo -n "/"
-#    echo -n "$(brazil_package_local_path)"
-#    echo "]"
-#
-#    echo "%B%{$fg[cyan]%}%* @%m]%{$reset_color%}%b "
-#    #echo $PROMPT_CORE
-#}
-
 function get_prompt() {
     echo -n "["
-    echo -n "%{$fg[yellow]%}$(brazil_workspace_dir)%{$fg[white]%}"
-    echo -n ":"
-    echo -n "%{$fg[magenta]%}%B$(brazil_package)%b%{$fg[white]%}"
-    echo -n "/"
-    echo -n "$(brazil_package_local_path)"
+    echo -n "Fill in a nice prompt here!"
     echo "]"
 
     echo "%B%{$fg[cyan]%}%* @%m]%{$reset_color%}%b "
@@ -75,14 +56,6 @@ function get_rprompt() {
 
 PROMPT='$(get_prompt)'
 RPROMPT='$(get_rprompt)'
-
-alias ws=cd_brazil_workspace
-alias pak=cd_brazil_package
-
-alias g2s2na='/apollo/env/iopmtools/bin/g2s2 $* -u http://g2s2-regional-repo-na.amazon.com/'
-alias g2s2g='/apollo/env/iopmtools/bin/g2s2 $* -u http://g2s2-repo-author-na.amazon.com/'
-alias g2s2eug='/apollo/env/iopmtools/bin/g2s2 $* -u http://g2s2-cache-eu.amazon.com/'
-alias g2s2eu='/apollo/env/iopmtools/bin/g2s2 $* -u http://g2s2-regional-repo-eu.amazon.com/'
 
 ######################
 ###    COMPLETION    ##

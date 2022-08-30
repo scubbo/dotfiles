@@ -1,126 +1,15 @@
-alias ssha='echo -e "\033]50;SetProfile=Solarized Dark\a";ssh dev-cloud;echo -e "\033]50;SetProfile=\a";'
-alias warg='echo -e "\033]50;SetProfile=Solarized Dark\a";ssh dev-cloud;echo -e "\033]50;SetProfile=\a";' # https://twitter.com/tusharnene/status/735874556339081216
-alias sshpi='echo -e "\033]50;SetProfile=Solarized Light\a";ssh pi;echo -e "\033]50;SetProfile=\a";'
-alias sts='open build/brazil-unit-tests/index.html'
-alias stis='open build/brazil-integ-tests/index.html'
-alias chks='open build/brazil-documentation/checkstyle/checkstyle_report.html'
-alias fbgs='open build/brazil-documentation/findbugs/findbugs_report.html'
-alias bcrs='brazil-build clean && brazil-build release && brazil-build server'
-alias bcr='brazil-build clean && brazil-build release'
-alias bbr='brazil-recursive-cmd --recAllDeps brazil-build release'
-alias nds='ninja-dev-sync'
-export PATH="/Users/jackjack/sdk/go1.18/bin:/Users/jackjack/Library/Python/3.7/bin:/apollo/env/ruby193/bin:/apollo/env/SDETools/bin:/usr/local/opt/openssl/bin:$PATH:/Users/jackjack/bin:/usr/local/sbin:/Users/jackjack/development/sbt/bin:/Users/jackjack/Development/gradle-2.14/bin:$HOME/.toolbox/bin:/Applications/Sublime Text.app/Contents/SharedSupport/bin"
+export PATH="/usr/local/opt/openssl/bin:$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin"
 # https://stackoverflow.com/a/56639316/1040915
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-export CDPATH="/Users/jackjack/workplace:/."
+export CDPATH="/Users/scubbo/Code:/."
 export BLOG_EDITOR=subl
-
-export ORACLE_VERSION=11.2.2
-export ORACLE_HOME="/Users/jackjack/Development/oracle/instantclient_11_2_2"
-export DYLD_LIBRARY_PATH=$ORACLE_HOME
-export LD_LIBRARY_PATH=$ORACLE_HOME
-export JAVA_HOME=`/usr/libexec/java_home`
-export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
-export ANDROID_HOME=$ANDROID_SDK_ROOT # This is a deprecated variable, but the QA team still uses it, so ¯\_(ツ)_/¯
-
-# http://stackoverflow.com/a/5257398
-DAY_OF_WEEK=$(date '+%u')
-if [ $DAY_OF_WEEK -lt 1 ] || [ $DAY_OF_WEEK -gt 5 ]
-then
-    cd ~/Code
-else
-    HOUR=$(date '+%H')
-    if [ $HOUR -lt 9 ] || [ $HOUR -gt 17 ]
-    then
-        cd ~/Code
-    else
-        echo "You're currently unemployed, no need to cd to workplace!"
-        cd ~/Code
-    fi
-fi
-
-function pat { #pushAndTest
-  currentBranchName=$(git symbolic-ref HEAD 2>/dev/null | perl -pe 's:refs/heads/(.*):$1:')
-  if [[ -z $currentBranchName ]] {
-    echo "Can't do nothing if you're not on a branch, champ"
-    return
-  }
-
-  upstreamInfo=$(git rev-parse --symbolic-full-name --abbrev-ref @{u})
-  upstreamArray=("${(@s:/:)upstreamInfo}")
-  upstreamRepoName=${upstreamArray[1]}
-  upstreamBranchName=${upstreamArray[2]} #Used for checking that the upstream repo has the correct branch checked out
-
-  if [[ -z $upstreamRepoName ]] {
-    echo "We seek the upstream.\nBut it is undetermined.\nRefrigerator."
-    return
-  }
-  if [[ $upstreamRepoName == "origin" ]] {
-    echo "Woah there, sparky! You're trying to use this function on a branch tracking origin. You probably don't want to do that."
-    return;
-  }
-
-  git commit -a --amend --no-edit # "Squash" your changes into the latest commit
-  git push -f # Really really push. For realsies.
-  remoteUrl=$(git config --get remote.$upstreamRepoName.url | perl -pe 's/^.*?:\/\/(.*)/$1/') # Sometimes git will prepend "ssh://" to remote urls. Sometimes it won't. How exciting!
-  remoteUrlArray=("${(@s/:/)remoteUrl}") # Split the remoteUrl into host and path
-
-  portNumber=$1
-  if [[ -z $portNumber ]] {
-    portNumber="1729" # it is a very interesting number
-  }
-  ssh -t ${remoteUrlArray[1]} "cd ${remoteUrlArray[2]}; actualCheckedBranch=\$(git symbolic-ref HEAD 2>/dev/null | perl -pe 's:refs/heads/::'); if [[ ! \$actualCheckedBranch == $upstreamBranchName ]] { echo \"Repo has wrong branch checked out, found '\$actualCheckedBranch' but expected '$upstreamBranchName'. Dying horribly\"} else { git reset --hard HEAD; brazil-build test || (cd build/brazil-unit-tests; python -m SimpleHTTPServer $portNumber)}"
-}
 
 function gnb() { #Git new-branch
   git fetch dev;
   git checkout --track dev/$1
-}
-
-# Devcloud Tunnel
-alias dt="ssh jackjack@dev-cloud -N -R localhost:2000:localhost:22"
-## AlwaysOnCluster
-alias odin="ssh -L 2009:localhost:2009 dev-cloud -f -N"
-function odin-get() {
-  ssh dev-cloud "/apollo/env/envImprovement/bin/odin-get $1"
-}
-
-# Our SSH keypair material name from odin
-material_name="com.amazon.music.datascienceplatform.sandbox.pem-na"
-
-# quick method to access our EMR cluster with ssh by fetching the keypair from odin
-setup-ssh-emr() {
-  # if the ssh-agent is not started, start it
-  if [ -z "$SSH_AUTH_SOCK" ] ; then
-    # must be called in eval not directly because of this: http://stackoverflow.com/questions/17846529/could-not-open-a-connection-to-your-authentication-agent/  4086756#4086756
-    eval `ssh-agent -s`
-  fi
-
-# fetch the keypair from odin, and add it to the ssh-agent right away. This doesn't write the keypair to disk at all
-  dir=$(mktemp -d $TMPDIR/setup-emr-XXXX) || exit 1
-  fifo=${dir}/pem
-  mkfifo -m 0600 $fifo || { rmdir $dir; exit 1; }
-  wget "http://localhost:2009/query?Operation=retrieve&ContentType=JSON&material.materialName=${material_name}&material.materialType=PrivateKey" --quiet -O - \
-   | tr '{},' '\n\n\n' \
-   | sed -n 's/"materialData":"\(.*\)"/\1/p' \
-   | base64 -D \
-   | openssl pkcs8 -nocrypt -inform DER -outform PEM > $fifo \
-   | ssh-add $fifo
-  rm -f $fifo && rmdir $dir
-}
-
-# Force update of quarantine policy - see https://tt.amazon.com/0096736527
-update-quarantine() {
-  sudo jamf flushPolicyHistory
-  sudo jamf policy
-  sudo /usr/local/amazon/bin/quarantine evaluate 
-}
-
-bab() { # Build and (come) back
-  cd $1 && brazil-build clean && brazil-build release && cd - && brazil-build clean && brazil-build release
 }
 
 notif() {
@@ -139,10 +28,6 @@ alert() {
     $1
 }
 
-
-# https://builderhub.corp.amazon.com/docs/rde/cli-guide/setup-post.html
-fpath=(~/.zsh/completion $fpath)
-autoload -Uz compinit && compinit -i
 
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 

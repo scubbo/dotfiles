@@ -8,19 +8,13 @@ build
 coral-generated-src/
 eclipse-bin/
 var/
-.settings/org.eclipse.jdt.core.prefs
 bin/
-apollo-overrides
 .settings/*
 *.iml
 velocity.log
 *.log
 *.pyc
 *.swp
-
-src/com/amazon/video/cdp/servlets/API-methods.xml
-src/com/amazon/video/cdp/servlets/API.xml
-src/com/amazon/video/cdp/servlets/index.html
 
 gradlew
 gradle/

@@ -59,38 +59,15 @@ alias guom='git branch --set-upstream-to origin/mainline'
 alias gbr='git checkout mainline; git branch -D @{-1}; git pull'
 # (to)Mainline-And-Update
 alias mau='git checkout mainline && git branch -D @{-1} && git pull'
-function bpd() {
-  if git diff-index --quiet HEAD --; then
-    # Check if we are behind upstream _first_, before building
-    git fetch;
-    if [[ $(git status --porcelain --branch | perl -pe 's/.*\[(.*)\].*/$1/') == *"behind"* ]]; then
-      echo "Current branch is behind upstream. This script will now exit";
-      return 1;
-    else
-      brazil-build release && git push && mau;
-    fi
-  else
-    echo "You have uncommitted files. Aborting";
-  fi
-}
 alias sqp='git sqa; git push -f'
 alias vi='vim -O'
-alias bwup='brazil ws --use -p'
-alias bbtia='brazil-build test-integration-assert'
-alias bcb='brazil-build clean && bb'
 alias cdup='cd `findup Config`'
 alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
-alias bre='brazil-runtime-exec'
 # https://apple.stackexchange.com/questions/110343/copy-last-command-in-terminal -
 # `echo "!!" | pbcopy` works on command line, but not from zshrc (copies literal "!!")
 alias copylast='fc -ln -1 | awk '{$1=$1}1' | pbcopy '
 alias runlast='sudo chmod +x "$_"; $_'
 
-
-function bnuke() {
-    brazil ws --remove -p $1 && rm -rf $1
-}
-alias bnl='bnuke $(basename ~-)' # https://unix.stackexchange.com/a/3285/30828
 
 function vif() {
     vi `find . -iname "*$1*"`
@@ -137,12 +114,6 @@ savessh() {
 }
 
 # Work on this shortcut: git status --porcelain | sed -ne 's/^ M //p' | tr '\n' '\0' | xargs -0 vi
-
-PATH="/Users/jackjack/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/Users/jackjack/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/Users/jackjack/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/Users/jackjack/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/Users/jackjack/perl5"; export PERL_MM_OPT;
 
 # Use curl from Homebrew
 export PATH=/usr/local/opt/curl/bin:$PATH
