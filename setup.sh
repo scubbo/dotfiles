@@ -6,11 +6,11 @@ set -e
 rm -f $HOME/.gitconfig # It might have got added while you were doing other things, and ln would complain
 ln -s ~/Code/dotfiles/zshrc $HOME/.zshrc
 arch_name=$(uname -m)
-if [[ "$arch_name" == "x86_64" ]; then
+if [[ "$arch_name" == "x86_64" ]]; then
   # OK, I know this doesn't _necessarily_ mean it's a Mac - but, on all machines I'll be running
   # this on, it's a fair bet!
   ln -s ~/Code/dotfiles/zshrc-local-mactop $HOME/.zshrc-local
-elif [[ "$arch_name" = "aarch64" ]; then
+elif [[ "$arch_name" = "aarch64" ]]; then
   ln -s ~/Code/dotfiles/zshrc-local-pi $HOME/.zshrc-local
 else
   echo "Unrecognized architecture: $arch_name"
