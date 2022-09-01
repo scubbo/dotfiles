@@ -30,9 +30,12 @@ source $SCRIPT_DIR/zsh/git.zsh
 setopt prompt_subst
 
 function get_prompt() {
-    echo -n "["
-    echo -n "Fill in a nice prompt here!"
-    echo "]"
+    ROOT=$(git_current_repo_root);
+    if [[ $ROOT == "" ]]; then
+      echo "[$(pwd)]";
+    else
+      echo "%{$fg[yellow]%}[$(basename $ROOT)]%{$reset_color%}"
+    fi
 
     echo "%B%{$fg[cyan]%}%* @%m]%{$reset_color%}%b "
     #echo $PROMPT_CORE
