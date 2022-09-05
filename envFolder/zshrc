@@ -34,7 +34,7 @@ function get_prompt() {
     if [[ $ROOT == "" ]]; then
       echo "[$(pwd)]";
     else
-      echo "%{$fg[yellow]%}[$(basename $ROOT)]%{$reset_color%}"
+      echo "%{$fg[yellow]%}[$(basename $ROOT)]%{$reset_color%}${$(pwd)##$(echo "$ROOT")}"
     fi
 
     echo "%B%{$fg[cyan]%}%* @%m]%{$reset_color%}%b "
