@@ -35,8 +35,10 @@ autoload -U edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd v edit-command-line
 
-# less options ;)
+# less options ( don't you mean fewer? https://xkcd.com/326/ ;) )
 export LESS="-iR"
+# and grep options
+export GREP_OPTIONS="--color=auto"
 
 bindkey '\e[1~'   beginning-of-line  # Linux console
 bindkey '\e[H'    beginning-of-line  # xterm
