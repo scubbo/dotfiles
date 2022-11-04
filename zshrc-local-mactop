@@ -31,6 +31,10 @@ alert() {
 
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
+# Allows `$ ij .` for "open an IntelliJ project from this folder"
+alias ij="/Applications/IntelliJ\ IDEA\ CE.app/Contents/MacOS/idea"
+# https://mackeeper.com/blog/flush-dns-cache-on-mac/ - though, note typo ("- flashcache")
+
 ###
 # ZLE configuration
 ###
