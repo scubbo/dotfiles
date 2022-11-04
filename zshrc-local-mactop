@@ -69,6 +69,11 @@ bindkey -v # Set default keybinding to VIINS
 # End ZLE configuration
 ###
 
+# NVM
+# https://tecadmin.net/install-nvm-macos-with-homebrew/
+export NVM_DIR=~/.nvm
+source $(brew --prefix nvm)/nvm.sh
+
 ENV_ZSHRC="${HOME}/.env/zshrc"
 if [[ -f "$ENV_ZSHRC" ]]; then
   source "$ENV_ZSHRC"
