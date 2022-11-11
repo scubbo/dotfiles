@@ -4,7 +4,7 @@ export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-export CDPATH="/Users/scubbo/Code:/."
+export CDPATH="/Users/scubbo/Code:."
 export BLOG_EDITOR=subl
 
 function gnb() { #Git new-branch
