@@ -28,6 +28,11 @@ alert() {
     $1
 }
 
+# KubeShell - get a shell on a pod that has the associated label
+ks() {
+  kubectl exec -it $(kubectl get pods -l $1 -o jsonpath='{.items[0].metadata.name}') -- sh
+}
+
 
 if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
