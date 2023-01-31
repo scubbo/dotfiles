@@ -8,9 +8,15 @@ arch_name=$(uname -m)
 if [[ "$arch_name" == "x86_64" ]]; then
   # OK, I know this doesn't _necessarily_ mean it's a Mac - but, on all machines I'll be running
   # this on, it's a fair bet!
+  # TODO - do this on hostname as well/instead
   ln -s ~/Code/dotfiles/zshrc-local-mactop $HOME/.zshrc-local
+  ln -s ~/Code/dotfiles/gitconfig-personal $HOME/.gitconfig-local
 elif [[ "$arch_name" = "aarch64" ]]; then
   ln -s ~/Code/dotfiles/zshrc-local-pi $HOME/.zshrc-local
+  ln -s ~/Code/dotfiles/gitconfig-personal $HOME/.gitconfig-local
+elif [[ "$arch_name" = "arm64" ]]; then
+  ln -s ~/Code/dotfiles/zshrc-work-mactop $HOME/.zshrc-local
+  ln -s ~/Code/dotfiles/gitconfig-professional $HOME/.gitconfig-local
 else
   echo "Unrecognized architecture: $arch_name"
   exit 1

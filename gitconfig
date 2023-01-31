@@ -1,6 +1,5 @@
-[user]
-	name = Jack Jackson
-	email = scubbojj@gmail.com
+[include]
+    path = ~/.gitconfig-local
 [push]
 	default = upstream
 [core]
