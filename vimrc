@@ -10,6 +10,8 @@ set cursorline
 set paste
 set splitright
 syntax on
+" https://jameschambers.co.uk/vim-typescript-slow
+set re=0
 set tw=0
 set expandtab
 set tabstop=4
@@ -41,3 +43,5 @@ match ErrorMsg '\s\+$'
 
 " Auto-close xml/html tags
 "iabbrev </ </<C-X><C-O>
+
+
