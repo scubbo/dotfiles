@@ -25,3 +25,5 @@ cdk.out/
 Pipfile
 Pipfile.lock
 venv/
+
+node_modules/
