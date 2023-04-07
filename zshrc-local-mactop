@@ -3,6 +3,8 @@ export PATH="/usr/local/opt/openssl/bin:$PATH:/Applications/Sublime Text.app/Con
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+# Install Julia - https://julialang.org/downloads/
+export PATH="$PATH:/Applications/Julia-1.8.app/Contents/Resources/julia/bin"
 
 export CDPATH="/Users/scubbo/Code:."
 export BLOG_EDITOR=subl
