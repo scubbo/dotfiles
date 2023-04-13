@@ -1,7 +1,9 @@
 [include]
     path = ~/.gitconfig-local
 [push]
-	default = upstream
+    # This way, you can pull from `origin/main`, but push to a branch with same name. That's how GitHub expects it!
+	default = current
+	autoSetupRemote = true
 [core]
 	pager = less -FMRiX
 	excludesfile = ~/.gitignore_global
