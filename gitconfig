@@ -14,20 +14,22 @@
     # Log, but shorter :P
     lg = log --format=format:'%C(yellow)%h%Creset %Cred%an%Creset %s' -5
     co = checkout
-    # "New Branch". TODO - make this pull the default branch name from the repo, since non-AMZN repos tend to use `main` now
-    nb = checkout -t origin/mainline -b
+    nb = checkout -t origin/main -b
     # "SQuash"
     sq = commit --amend --no-edit
     # "SQuash Amend"
     sqa = commit -a --amend --no-edit
     # Directed Acyclic Graph
     dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order --branches
+    # Directed Acyclic Graph, Limited - without `--branches`, this will only show the references that are passed as arguments
+    dagl = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
     # "Back up" - (should probably rename this to clarify that it's not "creating a backup", it's "moving backwards")
     bu = reset --hard HEAD^
     # "Kill The Spare" - delete the branch you were just on
     kts = branch -D @{-1}
     # List branches in descending order of latest commit. Kudos to rsametz@
     comms = branch --sort=-committerdate --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
+    clean-branches = !"for b in `git branch --list --merged | grep -v main | grep -v \"*\"`; do git branch -d $b; done"
 [pull]
 	rebase = true
 [color]
