@@ -9,6 +9,8 @@ coral-generated-src/
 eclipse-bin/
 var/
 bin/
+!bin/*.ts
+bin/*.d.ts
 .settings/*
 *.iml
 velocity.log
@@ -25,5 +27,9 @@ cdk.out/
 Pipfile
 Pipfile.lock
 venv/
+*.egg-info/
 
 node_modules/
+
+*.d.ts
+lib/*.js
