@@ -1,3 +1,6 @@
 [user]
 	name = Jack Jackson
 	email = jjackson2@legalzoom.com
+[pull]
+    rebase = false
+

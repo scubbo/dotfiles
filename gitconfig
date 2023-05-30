@@ -1,5 +1,3 @@
-[include]
-    path = ~/.gitconfig-local
 [push]
     # This way, you can pull from `origin/main`, but push to a branch with same name. That's how GitHub expects it!
 	default = current
@@ -48,3 +46,5 @@
     wsErrorHighlight = all
 [init]
 	defaultBranch = main
+[include]
+    path = ~/.gitconfig-local
