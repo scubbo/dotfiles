@@ -1,0 +1,14 @@
+{
+    "workbench.colorTheme": "Default Dark Modern",
+    "files.exclude": {
+        "**/__init__.py": true,
+        "**/__pycache__": true
+    },
+    "explorer.confirmDelete": false,
+    "editor.scrollBeyondLastLine": false,
+    "git.openRepositoryInParentFolders": "never",
+    "editor.rulers": [
+      120
+    ],
+    "explorer.confirmDragAndDrop": false
+}

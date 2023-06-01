@@ -43,4 +43,30 @@ else
   echo "Sublime is not currently installed - Sublime key-mappings not installed"
 fi
 
+VSCODE_APP_DIR="$HOME/Library/Application Support/Code/User"
+if [ -d "$VSCODE_APP_DIR" ]; then
+
+  # Exists and is a regular file - i.e. is not a symlink
+  SETTINGS_FILE_PATH="$VSCODE_APP_DIR/settings.json"
+  if [ -f "$SETTINGS_FILE_PATH" ]; then
+    rm -f "$SETTINGS_FILE_PATH"
+    ln -s VSCode/settings.json "$SETTINGS_FILE_PATH"
+  fi
+
+  KEYBINDINGS_FILE_PATH="$VSCODE_APP_DIR/keybindings.json"
+  if [ -f "$KEYBINDINGS_FILE_PATH" ]; then
+    rm -f "$KEYBINDINGS_FILE_PATH"
+    ln -s VSCode/keybindings.json "$KEYBINDINGS_FILE_PATH"
+  fi
+
+  EXTENSIONS_DIR_PATH="$HOME/.vscode/extensions"
+  if [ -d "$EXTENSIONS_DIR_PATH" && ! -L "$EXTENSIONS_DIR_PATH" ]; then
+    rm -rf "$EXTENSIONS_DIR_PATH"
+    ln -s VSCode/extensions "$EXTENSIONS_DIR_PATH"
+  fi
+
+else
+  echo "VSCode is not installed - settings and keybindings not installed"
+fi
+
 echo "Dotfiles installed."
