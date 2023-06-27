@@ -48,3 +48,5 @@
 	defaultBranch = main
 [include]
     path = ~/.gitconfig-local
+[user]
+	email = scubbojj@gmail.com
