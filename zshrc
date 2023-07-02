@@ -60,11 +60,6 @@ alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
 alias copylast='fc -ln -1 | awk '{$1=$1}1' | pbcopy '
 alias runlast='sudo chmod +x "$_"; $_'
 
-
-function vif() {
-    vi `find . -iname "*$1*"`
-}
-
 function sgrep() {
         grep -ir "$1" . | grep -v -e 'build' -e '.git' -e '^Binary'
 }
@@ -78,10 +73,6 @@ function projbranch() {
         branchName=git symbolic-ref HEAD 2>/dev/null | perl -pe 's:/refs/heads/::';
         popd >/dev/null
     done
-}
-
-tabname () {
-	printf "\e]1;$1\a"
 }
 
 psearch () {
@@ -126,3 +117,4 @@ else
   echo "You do not have cat-art installed, you heathen!"
 fi
 echo ""
+
