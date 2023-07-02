@@ -146,3 +146,10 @@ export NVM_DIR="$HOME/.nvm"
 
 # Visual Studio Code
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+
+# Share history between shell windows
+# https://nuclearsquid.com/writings/shared-history-in-zsh/
+# Appends every command to the history file once it is executed
+setopt inc_append_history
+# Reloads the history whenever you use it
+setopt share_history
