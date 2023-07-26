@@ -30,7 +30,7 @@ fixdel
 filetype indent plugin on
 autocmd FileType gitcommit set textwidth=72
 set colorcolumn=+1
-autocmd FileType gitcommit set formatoptions+=wq
+autocmd FileType gitcommit set formatoptions+=q
 autocmd FileType gitcommit set formatoptions-=l
 autocmd FileType gitcommit set nopaste
 " Setting this again because it seemed to not take effect from line 29?
