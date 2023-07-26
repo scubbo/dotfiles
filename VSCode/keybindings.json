@@ -49,5 +49,9 @@
     {
         "key": "alt+cmd+[IntlBackslash]",
         "command": "python.viewOutput"
+    },
+    {
+        "key": "cmd+q",
+        "command": "-workbench.action.quit"
     }
 ]
