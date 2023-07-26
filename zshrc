@@ -7,7 +7,6 @@
 source ~/.zshrc-local
 
 #set timezone
-#TZ=GB; export TZ;
 TZ='America/Los_Angeles'; export TZ;
 
 autoload -U compinit
@@ -19,26 +18,17 @@ setopt COMPLETE_IN_WORD
 ## never ever beep ever
 setopt NO_BEEP
 
-## automatically decide when to page a list of completions
-#LISTMAX=0
-
-## disable mail checking
-#MAILCHECK=0
-
 autoload -U colors
 colors
 
 #colors for vim
 export TERM=xterm-256color
 
-autoload -U edit-command-line
-zle -N edit-command-line
-bindkey -M vicmd v edit-command-line
-
 # less options ( don't you mean fewer? https://xkcd.com/326/ ;) )
 export LESS="-iR"
 # and grep options
 export GREP_OPTIONS="--color=auto"
+export EDITOR=vi
 
 bindkey '\e[1~'   beginning-of-line  # Linux console
 bindkey '\e[H'    beginning-of-line  # xterm
@@ -70,11 +60,6 @@ alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
 alias copylast='fc -ln -1 | awk '{$1=$1}1' | pbcopy '
 alias runlast='sudo chmod +x "$_"; $_'
 
-
-function vif() {
-    vi `find . -iname "*$1*"`
-}
-
 function sgrep() {
         grep -ir "$1" . | grep -v -e 'build' -e '.git' -e '^Binary'
 }
@@ -90,48 +75,10 @@ function projbranch() {
     done
 }
 
-
-# Tabname is always handy
-tabname () {
-	printf "\e]1;$1\a"
-}
-
 psearch () {
     ps aux | grep -i $1 | grep -v 'grep'
 }
 
-# make pushd and popd work properly (i.e. silently)
-# Doesn't work atm
-#push () {
-#	pushd $1 > /dev/null
-#}
-#
-#pop () {
-#	popd $1 > /dev/null
-#}
-
-savessh() {
-  eval `ssh-agent -s`
-  ssh-add ~/.ssh/id_rsa
-}
-
-# Work on this shortcut: git status --porcelain | sed -ne 's/^ M //p' | tr '\n' '\0' | xargs -0 vi
-
-# Use curl from Homebrew
-export PATH=/usr/local/opt/curl/bin:$PATH
-# And bin from homeir
-export PATH=$HOME/bin:$PATH
-
-export EDITOR=vi
-
-echo "\nHERE IS A PICTURE OF A CAT:\n"
-# http://stackoverflow.com/a/677212/1040915
-if hash cat-art 2>/dev/null; then
-  cat-art
-else
-  echo "You do not have cat-art installed, you heathen!"
-fi
-echo ""
 
 source $HOME/bin/indexed-funcs.zsh
 
@@ -146,3 +93,31 @@ export NVM_DIR="$HOME/.nvm"
 export AWS_PAGER="";
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+###
+# Path Alterations
+###
+# Visual Studio Code
+export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+# Use curl from Homebrew
+export PATH=/usr/local/opt/curl/bin:$PATH
+# And bin from homeir
+export PATH=$HOME/bin:$PATH
+
+# Share history between shell windows
+# https://nuclearsquid.com/writings/shared-history-in-zsh/
+# Appends every command to the history file once it is executed
+setopt inc_append_history
+# Reloads the history whenever you use it
+setopt share_history
+
+# Must come after adding `$HOME/bin` to `$PATH`
+echo "\nHERE IS A PICTURE OF A CAT:\n"
+# http://stackoverflow.com/a/677212/1040915
+if hash cat-art 2>/dev/null; then
+  cat-art
+else
+  echo "You do not have cat-art installed, you heathen!"
+fi
+echo ""
+

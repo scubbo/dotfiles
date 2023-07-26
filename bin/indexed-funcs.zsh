@@ -1,5 +1,5 @@
 # https://stackoverflow.com/a/49105399/1040915
-declare -a funcs=(tabname ff grhh grup gca psgrep dps kc token)
+declare -a funcs=(tabname ff grhh grup gca psgrep dps kc token vif)
 # AFAIK, there's no way to ensure that these "associative arrays"
 # (Dictionaries, basically) have key-sets that match `funcs` -
 # nor have I figured out how to do the obvious thing of
@@ -15,6 +15,7 @@ declare -A docs=(
     [dps]="Docker ps (pretty-formatted)"
     [kc]="KubeCtl"
     [token]="Copy Kubernetes Dashboard token"
+    [vif]="Find into vim"
 )
 
 declare -A defs=(
@@ -27,6 +28,9 @@ declare -A defs=(
     [dps]="docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'"
     [kc]="kubectl"
     [token]=$'kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" | pbcopy'
+    # 0h 0h Oh!
+    # TODO - it would be cool to be able to pass options to `find` (even _cooler_ to be able to arbitrarily pass options to either!)
+    [vif]='find . -iname "*$1" -print0 | xargs -0 vi -O'
 )
 
 # https://unix.stackexchange.com/a/287333/30828
