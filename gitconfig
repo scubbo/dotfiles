@@ -46,7 +46,7 @@
     wsErrorHighlight = all
 [init]
 	defaultBranch = main
-[include]
-    path = ~/.gitconfig-local
 [user]
 	email = scubbojj@gmail.com
+[include]
+    path = ~/.gitconfig-local
