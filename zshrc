@@ -104,13 +104,6 @@ export PATH=/usr/local/opt/curl/bin:$PATH
 # And bin from homeir
 export PATH=$HOME/bin:$PATH
 
-# Share history between shell windows
-# https://nuclearsquid.com/writings/shared-history-in-zsh/
-# Appends every command to the history file once it is executed
-setopt inc_append_history
-# Reloads the history whenever you use it
-setopt share_history
-
 # Must come after adding `$HOME/bin` to `$PATH`
 echo "\nHERE IS A PICTURE OF A CAT:\n"
 # http://stackoverflow.com/a/677212/1040915
