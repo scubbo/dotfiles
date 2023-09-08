@@ -10,5 +10,18 @@
     "editor.rulers": [
       120
     ],
-    "explorer.confirmDragAndDrop": false
+    "explorer.confirmDragAndDrop": false,
+    "debug.javascript.autoAttachFilter": "disabled",
+    "editor.tabSize": 2,
+    "workbench.colorCustomizations": {
+      "peekViewEditor.background": "#022844",
+      "tree.indentGuidesStroke": "#05ef3c"
+    },
+    "workbench.tree.indent": 15,
+    "workbench.tree.renderIndentGuides": "always",
+    "launch": {
+
+      "configurations": [],
+      "compounds": []
+    }
 }
