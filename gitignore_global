@@ -17,6 +17,7 @@ velocity.log
 *.log
 *.pyc
 *.swp
+dist/
 
 gradlew
 gradle/
