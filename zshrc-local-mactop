@@ -1,4 +1,4 @@
-export PATH="/usr/local/opt/openssl/bin:$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin"
+export PATH="/usr/local/opt/openssl/bin:$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin:$HOME/.luarocks/bin"
 # https://stackoverflow.com/a/56639316/1040915
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
