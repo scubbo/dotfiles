@@ -28,6 +28,15 @@
     # List branches in descending order of latest commit. Kudos to rsametz@
     comms = branch --sort=-committerdate --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
     clean-branches = !"for b in `git branch --list --merged | grep -v main | grep -v \"*\"`; do git branch -d $b; done"
+    rup = reset --hard @{u}
+    # Rich interactive recent branch picker - from twolf@
+    b = "!git branch --sort=committerdate --format='%(refname:short) (%(creatordate))' | tail -n 10 | fzf --header=\"Checkout Recent Branch\" --preview='git log --oneline --decorate-refs-exclude= -n 10 {+1}' | awk '{print $1}' - | xargs git checkout"
+    # Default branch - https://stackoverflow.com/a/67672350
+    def = "!git symbolic-ref refs/remotes/origin/HEAD | cut -d'/' -f4"
+    # See link above
+    remotesh = remote set-head origin --auto
+    # Wipe the existing branch (typically, if its upstream has been merged)
+    wipe = "!git checkout $(git def); git branch -D @{-1}; git pull"
 [pull]
 	rebase = true
 [color]
