@@ -59,3 +59,5 @@
 	email = scubbojj@gmail.com
 [include]
     path = ~/.gitconfig-local
+[help]
+    autocorrect = prompt
