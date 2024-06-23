@@ -1,5 +1,5 @@
 # https://stackoverflow.com/a/49105399/1040915
-declare -a funcs=(tabname ff grhh grup gca psgrep dps token vif k dc)
+declare -a funcs=(tabname ff grhh grup gca psgrep dps token vif k dc kex)
 # AFAIK, there's no way to ensure that these "associative arrays"
 # (Dictionaries, basically) have key-sets that match `funcs` -
 # nor have I figured out how to do the obvious thing of
@@ -17,6 +17,7 @@ declare -A docs=(
     [vif]="Find into vim"
     [k]="kubectl shortcut"
     [dc]="docker compose"
+    [kex]="Kubectl EXec in the first pod in namespace"
 )
 
 declare -A defs=(
@@ -33,6 +34,7 @@ declare -A defs=(
     [vif]='find . -iname "*$1" -print0 | xargs -0 vi -O'
     [k]='kubectl $@'
     [dc]='docker compose $@'
+    [kex]="kubectl get pods --no-headers | head -n1 | awk '{print \$1}' | xargs -o -I {} sh -c 'kubectl exec -it {} -- /bin/bash'"
 )
 
 # https://unix.stackexchange.com/a/287333/30828
