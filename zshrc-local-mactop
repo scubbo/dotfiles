@@ -5,6 +5,7 @@ export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 # Install Julia - https://julialang.org/downloads/
 export PATH="$PATH:/Applications/Julia-1.8.app/Contents/Resources/julia/bin"
+export VAULT_ADDR="http://vault.avril"
 
 export CDPATH="/Users/scubbo/Code:."
 export BLOG_EDITOR=subl
