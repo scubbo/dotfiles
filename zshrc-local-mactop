@@ -1,4 +1,4 @@
-export PATH="/usr/local/opt/openssl/bin:$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin:$HOME/.luarocks/bin"
+export PATH="/usr/local/opt/openssl/bin:$PATH:/Applications/Sublime Text.app/Contents/SharedSupport/bin:$HOME/.luarocks/bin:/$HOME/zig/zig-macos-x86_64-0.14.0-dev.2362+a47aa9dd9"
 # https://stackoverflow.com/a/56639316/1040915
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
