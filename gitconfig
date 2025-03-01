@@ -1,7 +1,27 @@
+# Several of these values are discussed in https://blog.gitbutler.com/how-git-core-devs-configure-git/
+[branch]
+    sort = -committerdate
+[column]
+    ui = auto
+[commit]
+    verbose = true
+[fetch]
+    prune = true
+    pruneTags = true
+    all = true
+[rebase]
+    autoSquash = true
+    autotash = true
+    updateRefs = true
+[rerere]
+    enabled = true
+    autoupdate = true
+[tag]
+    sort = version:refname
 [push]
-    # This way, you can pull from `origin/main`, but push to a branch with same name. That's how GitHub expects it!
-	default = current
+	default = simple
 	autoSetupRemote = true
+    followTags = true
 [core]
 	pager = less -FMRiX
 	excludesfile = ~/.gitignore_global
@@ -51,6 +71,10 @@
 	SizeLimit = 100m
 	threads = 1
 [diff]
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
     noprefix = true
     wsErrorHighlight = all
 [init]
