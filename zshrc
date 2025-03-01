@@ -56,6 +56,7 @@ alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
 # `echo "!!" | pbcopy` works on command line, but not from zshrc (copies literal "!!")
 alias copylast='fc -ln -1 | awk '{$1=$1}1' | pbcopy '
 alias runlast='sudo chmod +x "$_"; $_'
+alias dr='docker compose run --rm'
 
 function sgrep() {
         grep -ir "$1" . | grep -v -e 'build' -e '.git' -e '^Binary'
