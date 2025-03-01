@@ -1,33 +1,6 @@
 # Several of these values are discussed in https://blog.gitbutler.com/how-git-core-devs-configure-git/
-[branch]
-    sort = -committerdate
-[column]
-    ui = auto
-[commit]
-    verbose = true
-[fetch]
-    prune = true
-    pruneTags = true
-    all = true
-[rebase]
-    autoSquash = true
-    autotash = true
-    updateRefs = true
-[rerere]
-    enabled = true
-    autoupdate = true
-[tag]
-    sort = version:refname
-[push]
-	default = simple
-	autoSetupRemote = true
-    followTags = true
-[core]
-	pager = less -FMRiX
-	excludesfile = ~/.gitignore_global
-    fileMode = false
-    autocrlf = input
-	editor = vim
+[advice]
+    statusHints = false
 [alias]
     # Log, but shorter :P
     lg = log --format=format:'%C(yellow)%h%Creset %Cred%an%Creset %s' -5
@@ -57,19 +30,20 @@
     remotesh = remote set-head origin --auto
     # Wipe the existing branch (typically, if its upstream has been merged)
     wipe = "!git checkout $(git def); git branch -D @{-1}; git pull"
-[pull]
-	rebase = true
+[branch]
+    sort = -committerdate
 [color]
 	ui = auto
-[amazon]
-	append-cr-url = true
-	pull-request-by-default = true
-[advice]
-    statusHints = false
-[pack]
-	windowMemory = 100m
-	SizeLimit = 100m
-	threads = 1
+[column]
+    ui = auto
+[commit]
+    verbose = true
+[core]
+	pager = less -FMRiX
+	excludesfile = ~/.gitignore_global
+    fileMode = false
+    autocrlf = input
+	editor = vim
 [diff]
     algorithm = histogram
     colorMoved = plain
@@ -77,11 +51,34 @@
     renames = true
     noprefix = true
     wsErrorHighlight = all
-[init]
-	defaultBranch = main
-[user]
-	email = scubbojj@gmail.com
+[fetch]
+    prune = true
+    pruneTags = true
+    all = true
 [include]
     path = ~/.gitconfig-local
+[init]
+	defaultBranch = main
 [help]
     autocorrect = prompt
+[rebase]
+    autoSquash = true
+    autotash = true
+    updateRefs = true
+[rerere]
+    enabled = true
+    autoupdate = true
+[tag]
+    sort = version:refname
+[pack]
+	windowMemory = 100m
+	SizeLimit = 100m
+	threads = 1
+[pull]
+	rebase = true
+[push]
+	default = simple
+	autoSetupRemote = true
+    followTags = true
+[user]
+	email = scubbojj@gmail.com
