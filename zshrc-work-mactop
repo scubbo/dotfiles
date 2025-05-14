@@ -16,6 +16,7 @@ export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 # https://stackoverflow.com/a/43087047
 bindkey -e
 
+alias ttt="turbo typecheck test"
 
 ENV_ZSHRC="${HOME}/.env/zshrc"
 if [[ -f "$ENV_ZSHRC" ]]; then
