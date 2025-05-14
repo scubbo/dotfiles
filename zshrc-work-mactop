@@ -3,6 +3,8 @@ export BOUNDARY_ADDR=https://boundary.devops.prd.aws-01.legalzoom.com
 
 # https://stackoverflow.com/a/51939526
 export PATH="/usr/local/opt/python/libexec/bin:$PATH"
+# My own scripts!
+export PATH="/Users/jackjackson/Code/scubbo-scripts:$PATH"
 
 # Generated with `/opt/homebrew/bin/brew shellenv`
 export HOMEBREW_PREFIX="/opt/homebrew";
