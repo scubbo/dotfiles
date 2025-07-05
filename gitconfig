@@ -82,3 +82,6 @@
     followTags = true
 [user]
 	email = scubbojj@gmail.com
+	name = Jack Jackson
+[http]
+	postBuffer = 157286400
