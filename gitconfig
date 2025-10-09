@@ -87,3 +87,8 @@
 	name = Jack Jackson
 [http]
 	postBuffer = 157286400
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

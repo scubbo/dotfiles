@@ -35,3 +35,6 @@ node_modules/
 *.d.ts
 lib/*.js
 dist/
+
+Private\ \&\ Shared/
+CLAUDE.local.md

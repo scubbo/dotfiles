@@ -18,6 +18,12 @@ bindkey -e
 
 alias ttt="turbo --affected typecheck test"
 
+# NVM setup
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+
 ENV_ZSHRC="${HOME}/.env/zshrc"
 if [[ -f "$ENV_ZSHRC" ]]; then
   source "$ENV_ZSHRC"
