@@ -4,8 +4,10 @@
 [alias]
     # Log, but shorter :P
     lg = log --format=format:'%C(yellow)%h%Creset %Cred%an%Creset %s' -5
+    # Log my commits
+    mine = !git log --author=$(git config user.email) --oneline
     co = checkout
-    nb = checkout -t origin/main -b
+    nb = "!git checkout main && git pull && git checkout -b"
     # "SQuash"
     sq = commit --amend --no-edit
     # "SQuash Amend"
