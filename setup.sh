@@ -29,6 +29,7 @@ ln -s ~/Code/dotfiles/vimrc $HOME/.vimrc
 ln -s ~/Code/dotfiles/envFolder $HOME/.env
 ln -s ~/Code/dotfiles/bin $HOME/bin
 ln -s ~/Code/dotfiles/screenrc $HOME/.screenrc
+ln -s ~/Code/dotfiles/.claude $HOME/.claude
 
 # Install Sublime keybindings, if sublime is present
 SUBLIME_KEYMAPPING_DIR="$HOME/Library/Application Support/Sublime Text"
