@@ -17,6 +17,7 @@ export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 bindkey -e
 
 alias ttt="turbo --affected typecheck test"
+alias plf="git fetch origin && git merge origin main; pnpm install && git add -A && git commit -m 'pnpm-lock conflict fix' && git push"
 
 # NVM setup
 export NVM_DIR="$HOME/.nvm"
