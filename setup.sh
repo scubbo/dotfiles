@@ -30,6 +30,12 @@ ln -s ~/Code/dotfiles/envFolder $HOME/.env
 ln -s ~/Code/dotfiles/bin $HOME/bin
 ln -s ~/Code/dotfiles/screenrc $HOME/.screenrc
 ln -s ~/Code/dotfiles/.claude $HOME/.claude
+mkdir -p ~/.cursor
+if [[ -d "$HOME/.cursor/commands" ]]; then
+  echo "Cannot link ~/.cursor/commands - already exists"
+else
+  ln -s ~/Code/dotfiles/cursor/commands $HOME/.cursor/commands
+fi
 
 # Install Sublime keybindings, if sublime is present
 SUBLIME_KEYMAPPING_DIR="$HOME/Library/Application Support/Sublime Text"
