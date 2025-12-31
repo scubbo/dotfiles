@@ -57,6 +57,8 @@ alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
 alias copylast='fc -ln -1 | awk '{$1=$1}1' | pbcopy '
 alias runlast='sudo chmod +x "$_"; $_'
 alias dr='docker compose run --rm'
+# Zed editor
+alias zed="open -a /Applications/Zed.app"
 
 function sgrep() {
         grep -ir "$1" . | grep -v -e 'build' -e '.git' -e '^Binary'
