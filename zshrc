@@ -120,3 +120,13 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# opencode
+export PATH=/Users/jackjackson/.opencode/bin:$PATH
+
+# bun completions
+[ -s "/Users/jackjackson/.bun/_bun" ] && source "/Users/jackjackson/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
