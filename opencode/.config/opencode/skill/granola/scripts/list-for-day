@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""List Granola meetings for a specific day."""
+
+import argparse
+import sys
+from pathlib import Path
+from datetime import datetime, date
+
+# Add scripts dir to path for local imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from granola_parser import load_cache, get_documents, format_timestamp, get_meeting_metadata
+
+
+def main():
+    parser = argparse.ArgumentParser(description='List Granola meetings for a specific day')
+    parser.add_argument('date', nargs='?', default=None, 
+                        help='Date in YYYY-MM-DD format (defaults to today)')
+    args = parser.parse_args()
+    
+    # Parse the target date
+    if args.date:
+        try:
+            target_date = datetime.strptime(args.date, '%Y-%m-%d').date()
+        except ValueError:
+            print(f"Error: Invalid date format '{args.date}'. Use YYYY-MM-DD.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        target_date = date.today()
+    
+    try:
+        state = load_cache()
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    documents = get_documents(state)
+    
+    # Filter to target date
+    matching = []
+    for doc in documents:
+        created_at = doc.get('created_at', '')
+        if not created_at:
+            continue
+        try:
+            doc_date = datetime.fromisoformat(created_at.replace('Z', '+00:00')).date()
+            if doc_date == target_date:
+                matching.append(doc)
+        except (ValueError, AttributeError):
+            continue
+    
+    print(f"Meetings for {target_date.strftime('%Y-%m-%d')} ({target_date.strftime('%A')}):\n")
+    
+    if not matching:
+        print("No meetings found for this day.")
+        return
+    
+    print(f"Found {len(matching)} meeting(s):\n")
+    
+    for doc in matching:
+        doc_id = doc.get('id', 'unknown')
+        title = doc.get('title', 'Untitled')
+        created = format_timestamp(doc.get('created_at', ''))
+        doc_type = doc.get('type', 'unknown')
+        
+        # Get attendee info from metadata
+        metadata = get_meeting_metadata(state, doc_id)
+        attendee_info = ""
+        if metadata:
+            attendees = metadata.get('attendees', [])
+            if attendees:
+                names = [a.get('name', a.get('email', 'Unknown')) for a in attendees[:3]]
+                attendee_info = ", ".join(names)
+                if len(attendees) > 3:
+                    attendee_info += f" +{len(attendees) - 3} more"
+        
+        print(f"**{title}**")
+        print(f"  ID: `{doc_id}`")
+        print(f"  Time: {created}")
+        print(f"  Type: {doc_type}")
+        if attendee_info:
+            print(f"  With: {attendee_info}")
+        print()
+
+
+if __name__ == '__main__':
+    main()

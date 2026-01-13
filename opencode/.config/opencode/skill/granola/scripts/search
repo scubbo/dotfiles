@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""Search Granola meetings by keyword."""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Add scripts dir to path for local imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from granola_parser import (
+    load_cache, get_documents, get_transcript, get_summary,
+    format_timestamp, transcript_to_text
+)
+
+
+def search_in_text(text: str, query: str) -> list[str]:
+    """Find lines containing the query (case-insensitive)."""
+    if not text:
+        return []
+    
+    query_lower = query.lower()
+    matches = []
+    
+    for line in text.split('\n'):
+        if query_lower in line.lower():
+            matches.append(line.strip())
+    
+    return matches
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Search Granola meetings')
+    parser.add_argument('query', help='Search query')
+    parser.add_argument('--limit', '-l', type=int, default=10, 
+                        help='Maximum number of results')
+    args = parser.parse_args()
+    
+    try:
+        state = load_cache()
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    documents = get_documents(state)
+    query = args.query
+    results = []
+    
+    for doc in documents:
+        doc_id = doc.get('id', '')
+        title = doc.get('title', 'Untitled')
+        created = doc.get('created_at', '')
+        
+        matches = {
+            'title': False,
+            'summary': [],
+            'transcript': []
+        }
+        
+        # Search in title
+        if query.lower() in title.lower():
+            matches['title'] = True
+        
+        # Search in summary
+        summary = get_summary(state, doc_id)
+        if summary:
+            matches['summary'] = search_in_text(summary, query)
+        
+        # Search in transcript
+        transcript_segments = get_transcript(state, doc_id)
+        if transcript_segments:
+            transcript_text = transcript_to_text(transcript_segments)
+            matches['transcript'] = search_in_text(transcript_text, query)
+        
+        # Check if any matches
+        if matches['title'] or matches['summary'] or matches['transcript']:
+            results.append({
+                'doc': doc,
+                'matches': matches
+            })
+        
+        if len(results) >= args.limit:
+            break
+    
+    if not results:
+        print(f"No meetings found matching '{query}'.")
+        return
+    
+    print(f"Found {len(results)} meeting(s) matching '{query}':\n")
+    
+    for result in results:
+        doc = result['doc']
+        matches = result['matches']
+        
+        doc_id = doc.get('id', 'unknown')
+        title = doc.get('title', 'Untitled')
+        created = format_timestamp(doc.get('created_at', ''))
+        
+        print(f"**{title}**")
+        print(f"  ID: `{doc_id}`")
+        print(f"  Date: {created}")
+        
+        if matches['title']:
+            print(f"  Match in: title")
+        
+        if matches['summary']:
+            print(f"  Match in: summary ({len(matches['summary'])} line(s))")
+            for line in matches['summary'][:2]:
+                print(f"    > {line[:100]}{'...' if len(line) > 100 else ''}")
+        
+        if matches['transcript']:
+            print(f"  Match in: transcript ({len(matches['transcript'])} line(s))")
+            for line in matches['transcript'][:2]:
+                print(f"    > {line[:100]}{'...' if len(line) > 100 else ''}")
+        
+        print()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+"""Read a specific Granola meeting's transcript and/or summary."""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Add scripts dir to path for local imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from granola_parser import (
+    load_cache, get_document_by_id, get_transcript, get_summary,
+    get_meeting_metadata, format_timestamp, transcript_to_text
+)
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Read a Granola meeting')
+    parser.add_argument('meeting_id', help='Meeting ID (UUID)')
+    parser.add_argument('--transcript-only', '-t', action='store_true',
+                        help='Show only the transcript')
+    parser.add_argument('--summary-only', '-s', action='store_true',
+                        help='Show only the summary')
+    args = parser.parse_args()
+    
+    try:
+        state = load_cache()
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    doc = get_document_by_id(state, args.meeting_id)
+    if not doc:
+        print(f"Error: Meeting not found with ID '{args.meeting_id}'", file=sys.stderr)
+        sys.exit(1)
+    
+    title = doc.get('title', 'Untitled')
+    created = format_timestamp(doc.get('created_at', ''))
+    
+    # Print header
+    print(f"# {title}")
+    print(f"**Date:** {created}")
+    
+    # Print attendees if available
+    metadata = get_meeting_metadata(state, args.meeting_id)
+    if metadata:
+        creator = metadata.get('creator', {})
+        creator_name = creator.get('name', creator.get('email', 'Unknown'))
+        print(f"**Organizer:** {creator_name}")
+        
+        attendees = metadata.get('attendees', [])
+        if attendees:
+            names = [a.get('name', a.get('email', 'Unknown')) for a in attendees]
+            print(f"**Attendees:** {', '.join(names)}")
+    
+    print()
+    
+    show_summary = not args.transcript_only
+    show_transcript = not args.summary_only
+    
+    # Print summary
+    if show_summary:
+        summary = get_summary(state, args.meeting_id)
+        if summary:
+            print("## Summary\n")
+            print(summary)
+            print()
+        elif not args.summary_only:
+            print("*No summary available.*\n")
+    
+    # Print transcript
+    if show_transcript:
+        transcript_segments = get_transcript(state, args.meeting_id)
+        if transcript_segments:
+            print("## Transcript\n")
+            print(transcript_to_text(transcript_segments))
+            print()
+        elif not args.transcript_only:
+            print("*No transcript available.*\n")
+
+
+if __name__ == '__main__':
+    main()

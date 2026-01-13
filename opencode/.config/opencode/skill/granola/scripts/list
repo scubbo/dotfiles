@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""List recent Granola meetings."""
+
+import argparse
+import sys
+from pathlib import Path
+
+# Add scripts dir to path for local imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+from granola_parser import load_cache, get_documents, format_timestamp, get_meeting_metadata
+
+
+def main():
+    parser = argparse.ArgumentParser(description='List recent Granola meetings')
+    parser.add_argument('--limit', '-l', type=int, default=10, help='Number of meetings to show')
+    args = parser.parse_args()
+    
+    try:
+        state = load_cache()
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    documents = get_documents(state)
+    
+    if not documents:
+        print("No meetings found.")
+        return
+    
+    print(f"Recent meetings (showing {min(args.limit, len(documents))} of {len(documents)}):\n")
+    
+    for doc in documents[:args.limit]:
+        doc_id = doc.get('id', 'unknown')
+        title = doc.get('title', 'Untitled')
+        created = format_timestamp(doc.get('created_at', ''))
+        doc_type = doc.get('type', 'unknown')
+        
+        # Get attendee count from metadata
+        metadata = get_meeting_metadata(state, doc_id)
+        attendee_count = 0
+        if metadata:
+            attendees = metadata.get('attendees', [])
+            attendee_count = len(attendees) if attendees else 0
+        
+        print(f"**{title}**")
+        print(f"  ID: `{doc_id}`")
+        print(f"  Date: {created}")
+        print(f"  Type: {doc_type}")
+        if attendee_count > 0:
+            print(f"  Attendees: {attendee_count}")
+        print()
+
+
+if __name__ == '__main__':
+    main()
