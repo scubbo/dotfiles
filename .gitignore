@@ -2,3 +2,8 @@
 !bin/
 # ...but, don't track `bin/subl`, since that is an OS (Mac)-specific symlink
 bin/subl
+# Don't ignore dotfiles - they're a big deal here! ...
+!.*
+# ...but do still ignore .DS_STORE
+.DS_STORE
+
