@@ -15,6 +15,8 @@ export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 # https://stackoverflow.com/a/43087047
 bindkey -e
+# npm token
+export NPM_TOKEN=$(cat ~/.npm-token)
 
 alias ttt="turbo --affected typecheck test"
 alias plf="git fetch origin && git merge origin main; pnpm install && git add -A && git commit -m 'pnpm-lock conflict fix' && git push"
