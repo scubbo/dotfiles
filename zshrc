@@ -59,6 +59,8 @@ alias runlast='sudo chmod +x "$_"; $_'
 alias dr='docker compose run --rm'
 # Zed editor
 alias zed="open -a /Applications/Zed.app"
+# https://mackeeper.com/blog/flush-dns-cache-on-mac/ - though, note typo ("- flashcache")
+alias flush_cache="sudo dscacheutil -flushcache ;sudo killall -HUP mDNSResponder"
 
 function sgrep() {
         grep -ir "$1" . | grep -v -e 'build' -e '.git' -e '^Binary'
