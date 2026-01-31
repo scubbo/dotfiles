@@ -81,6 +81,34 @@ psearch () {
     ps aux | grep -i $1 | grep -v 'grep'
 }
 
+# Courtesy of https://gist.github.com/johnlindquist/4deb59e4d74a36c8a4cc2362663f8299
+funced () {
+	[[ -z "$1" ]] && {
+		echo "Usage: funced <function_name>"
+		return 1
+	}
+	local func="$1"
+	[[ $(whence -w "$func" 2>/dev/null) != *function* ]] && {
+		echo "'$func' is not a function"
+		return 1
+	}
+	local file="${functions_source[$func]}"
+	[[ -z "$file" || ! -f "$file" ]] && {
+		echo "Can't find source file for '$func'"
+		return 1
+	}
+	local line=$(grep -n -m1 -E "^\s*(function\s+)?${func}\s*\(|eval\s+[\"']${func}\s*\(" "$file" | cut -d: -f1)
+	[[ -z "$line" ]] && line=1
+	local editor_name="${EDITOR_CMD:t}"
+	case "$editor_name" in
+		(zed) "$EDITOR_CMD" "$file:$line" ;;
+		(cursor | code | code-insiders) "$EDITOR_CMD" -g "$file:$line" ;;
+		(micro) "$EDITOR_CMD" "+$line" "$file" ;;
+		(vim | nvim) "$EDITOR_CMD" "+$line" "$file" ;;
+		(*) "$EDITOR_CMD" "$file:$line" ;;
+	esac
+}
+
 
 source $HOME/bin/indexed-funcs.zsh
 
