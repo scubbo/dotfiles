@@ -2,34 +2,55 @@
 
 set -e
 
-# Install dotfiles
-ln -s ~/Code/dotfiles/zshrc $HOME/.zshrc
+# Detect machine type
+current_hostname=$(hostname)
 arch_name=$(uname -m)
-if [[ "$arch_name" == "x86_64" ]]; then
-  # OK, I know this doesn't _necessarily_ mean it's a Mac - but, on all machines I'll be running
-  # this on, it's a fair bet!
-  # TODO - do this on hostname as well/instead
-  ln -s ~/Code/dotfiles/zshrc-local-mactop $HOME/.zshrc-local
-  ln -s ~/Code/dotfiles/gitconfig-personal $HOME/.gitconfig-local
-elif [[ "$arch_name" = "aarch64" ]]; then
-  ln -s ~/Code/dotfiles/zshrc-local-pi $HOME/.zshrc-local
-  ln -s ~/Code/dotfiles/gitconfig-personal $HOME/.gitconfig-local
-elif [[ "$arch_name" = "arm64" ]]; then
-  ln -s ~/Code/dotfiles/zshrc-work-mactop $HOME/.zshrc-local
-  ln -s ~/Code/dotfiles/gitconfig-professional $HOME/.gitconfig-local
+
+if [[ "$current_hostname" == "MacBookPro.avril" ]]; then
+  MACHINE_TYPE="personal"
+  ln -sf ~/Code/dotfiles/zshrc-local-mactop $HOME/.zshrc-local
+  ln -sf ~/Code/dotfiles/gitconfig-personal $HOME/.gitconfig-local
+elif [[ "$current_hostname" == "Mac.avril" ]]; then
+  MACHINE_TYPE="work"
+  ln -sf ~/Code/dotfiles/zshrc-work-mactop $HOME/.zshrc-local
+  ln -sf ~/Code/dotfiles/gitconfig-professional $HOME/.gitconfig-local
+elif [[ "$arch_name" == "aarch64" ]]; then
+  MACHINE_TYPE="personal"
+  ln -sf ~/Code/dotfiles/zshrc-local-pi $HOME/.zshrc-local
+  ln -sf ~/Code/dotfiles/gitconfig-personal $HOME/.gitconfig-local
 else
-  echo "Unrecognized architecture: $arch_name"
+  echo "Unrecognized machine: hostname=$current_hostname, arch=$arch_name"
   exit 1
 fi
 
-ln -s ~/Code/dotfiles/gitignore_global $HOME/.gitignore_global
-rm -f $HOME/.gitconfig # It might have got added while you were doing other things, and ln would complain
-ln -s ~/Code/dotfiles/gitconfig $HOME/.gitconfig
-ln -s ~/Code/dotfiles/vimrc $HOME/.vimrc
-ln -s ~/Code/dotfiles/envFolder $HOME/.env
-ln -s ~/Code/dotfiles/bin $HOME/bin
-ln -s ~/Code/dotfiles/screenrc $HOME/.screenrc
-ln -s ~/Code/dotfiles/.claude $HOME/.claude
+# Install dotfiles
+ln -sf ~/Code/dotfiles/zshrc $HOME/.zshrc
+ln -sf ~/Code/dotfiles/gitignore_global $HOME/.gitignore_global
+ln -sf ~/Code/dotfiles/gitconfig $HOME/.gitconfig
+ln -sf ~/Code/dotfiles/vimrc $HOME/.vimrc
+ln -sfn ~/Code/dotfiles/envFolder $HOME/.env
+ln -sfn ~/Code/dotfiles/bin $HOME/bin
+ln -sf ~/Code/dotfiles/screenrc $HOME/.screenrc
+# Generate ~/.claude/CLAUDE.md from base + machine-specific overlay
+mkdir -p $HOME/.claude
+CLAUDE_WARNING="<!-- GENERATED FILE - DO NOT EDIT DIRECTLY -->\n<!-- Edit CLAUDE-base.md and CLAUDE-work.md (or CLAUDE-personal.md) in dotfiles repo -->\n\n"
+CLAUDE_BASE=~/Code/dotfiles/.claude/CLAUDE-base.md
+
+if [[ "$MACHINE_TYPE" == "work" ]]; then
+  CLAUDE_OVERLAY=~/Code/dotfiles/.claude/CLAUDE-work.md
+else
+  CLAUDE_OVERLAY=~/Code/dotfiles-private/.claude/CLAUDE-personal.md
+  if [[ ! -f "$CLAUDE_OVERLAY" ]]; then
+    echo "ERROR: Personal machine detected but $CLAUDE_OVERLAY not found."
+    echo "Please clone dotfiles-private repo to ~/Code/dotfiles-private"
+    exit 1
+  fi
+fi
+
+echo -e "$CLAUDE_WARNING" > $HOME/.claude/CLAUDE.md
+cat "$CLAUDE_OVERLAY" >> $HOME/.claude/CLAUDE.md
+echo "" >> $HOME/.claude/CLAUDE.md
+cat "$CLAUDE_BASE" >> $HOME/.claude/CLAUDE.md
 mkdir -p ~/.cursor
 if [[ -d "$HOME/.cursor/commands" ]]; then
   echo "Cannot link ~/.cursor/commands - already exists"
@@ -67,7 +88,7 @@ if [ -d "$VSCODE_APP_DIR" ]; then
   fi
 
   EXTENSIONS_DIR_PATH="$HOME/.vscode/extensions"
-  if [ -d "$EXTENSIONS_DIR_PATH" && ! -L "$EXTENSIONS_DIR_PATH" ]; then
+  if [[ -d "$EXTENSIONS_DIR_PATH" && ! -L "$EXTENSIONS_DIR_PATH" ]]; then
     rm -rf "$EXTENSIONS_DIR_PATH"
     ln -s VSCode/extensions "$EXTENSIONS_DIR_PATH"
   fi
