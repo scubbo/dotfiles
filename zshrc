@@ -158,3 +158,9 @@ export PATH=/Users/jackjackson/.opencode/bin:$PATH
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Added by Hades
+export PATH="$PATH:$HOME/.hades/bin"
+
+# openharness
+export PATH=/Users/jackjackson/.openharness/bin:$PATH
