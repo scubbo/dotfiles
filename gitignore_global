@@ -2,6 +2,7 @@
 !.gitignore
 !.github/
 !.agents/
+!.claude/
 .git
 .classpath
 .project
@@ -40,3 +41,5 @@ dist/
 
 Private\ \&\ Shared/
 CLAUDE.local.md
+.claude/worktrees
+**/.claude/settings.json
