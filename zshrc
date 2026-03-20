@@ -115,9 +115,7 @@ source $HOME/bin/indexed-funcs.zsh
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+eval "$(fnm env --use-on-cd)"
 
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
 export AWS_PAGER="";
