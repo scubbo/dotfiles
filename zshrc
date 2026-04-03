@@ -9,9 +9,6 @@ source ~/.zshrc-local
 #set timezone
 TZ='America/Los_Angeles'; export TZ;
 
-autoload -U compinit
-compinit
-
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
 
@@ -21,13 +18,9 @@ setopt NO_BEEP
 autoload -U colors
 colors
 
-#colors for vim
-export TERM=xterm-256color
-
 # less options ( don't you mean fewer? https://xkcd.com/326/ ;) )
 export LESS="-iR"
-# and grep options
-export GREP_OPTIONS="--color=auto"
+alias grep='grep --color=auto'
 export EDITOR=vi
 
 bindkey '\e[1~'   beginning-of-line  # Linux console
@@ -45,7 +38,7 @@ function pskill() {
 alias exist="echo 'Do I really need to be told to exist?\nI choose not to. Exiting in 3...';sleep 1;echo '2...';sleep 1;echo '1...';sleep 1;echo 'Goodbye cruel world';exit"
 alias loglist="ls | perl -pe 's/(.*?)\..*/$1/g' | uniq"
 alias svi='sudo -E vi'
-alias pyserv='python -m SimpleHTTPServer'
+alias pyserv='python -m http.server'
 alias please='sudo'
 alias guom='git branch --set-upstream-to origin/mainline'
 alias sqp='git sqa; git push -f'
@@ -112,6 +105,7 @@ funced () {
 
 source $HOME/bin/indexed-funcs.zsh
 
+autoload -U compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
 
@@ -120,15 +114,13 @@ eval "$(fnm env --use-on-cd)"
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
 export AWS_PAGER="";
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source <(fzf --zsh)
 
 ###
 # Path Alterations
 ###
 # Visual Studio Code
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-# Use curl from Homebrew
-export PATH=/usr/local/opt/curl/bin:$PATH
 # And bin from homeir
 export PATH=$HOME/bin:$PATH
 
@@ -142,10 +134,6 @@ else
 fi
 echo ""
 
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 export PATH="$HOME/.local/bin:$PATH"
 
