@@ -30,15 +30,21 @@ source $SCRIPT_DIR/zsh/git.zsh
 setopt prompt_subst
 
 function get_prompt() {
+    local repo_path
     ROOT=$(git_current_repo_root);
     if [[ $ROOT == "" ]]; then
-      echo "[$(pwd)]";
+      repo_path="[$(pwd)]";
     else
-      echo "%{$fg[yellow]%}[$(basename $ROOT)]%{$reset_color%}${$(pwd)##$(echo "$ROOT")}"
+      repo_path="%{$fg[yellow]%}[$(basename $ROOT)]%{$reset_color%}${$(pwd)##$(echo "$ROOT")}"
     fi
 
-    echo "%B%{$fg[cyan]%}%* @%m]%{$reset_color%}%b "
-    #echo $PROMPT_CORE
+    local git_info="$(git_branch_prompt)"
+
+    echo -n "%B%{$fg[cyan]%}%* @%m]%{$reset_color%}%b ${repo_path}"
+    if [[ -n $git_info ]]; then
+      echo -n " ${git_info}"
+    fi
+    echo "\n$ "
 }
 
 function color_dump() {
@@ -53,7 +59,6 @@ function color_dump() {
 }
 
 function get_rprompt() {
-    echo "$(git_branch_prompt)"
     #echo $RPROMPT_CORE
 }
 
