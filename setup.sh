@@ -31,6 +31,7 @@ ln -sf ~/Code/dotfiles/vimrc $HOME/.vimrc
 ln -sfn ~/Code/dotfiles/envFolder $HOME/.env
 ln -sfn ~/Code/dotfiles/bin $HOME/bin
 ln -sf ~/Code/dotfiles/screenrc $HOME/.screenrc
+ln -sf ~/Code/dotfiles/tmux.conf $HOME/.tmux.conf
 # Generate ~/.claude/CLAUDE.md from base + machine-specific overlay
 mkdir -p $HOME/.claude
 CLAUDE_WARNING="<!-- GENERATED FILE - DO NOT EDIT DIRECTLY -->\n<!-- Edit CLAUDE-base.md and CLAUDE-work.md (or CLAUDE-personal.md) in dotfiles repo -->\n\n"
