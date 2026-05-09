@@ -153,3 +153,7 @@ YOU MUST follow this debugging framework for ANY technical issue:
 - Track patterns in user feedback to improve collaboration over time
 - When you notice something that should be fixed but is unrelated to your current task, document it in your journal rather than fixing it immediately
 
+## Shell and tooling preferences
+
+- Use `jq` for JSON processing in shell commands, not `python3 -m json.tool` or any Python-based JSON parsing
+
