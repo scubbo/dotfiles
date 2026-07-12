@@ -43,3 +43,5 @@ Private\ \&\ Shared/
 CLAUDE.local.md
 .claude/worktrees
 **/.claude/settings.json
+
+**/.claude/settings.local.json
