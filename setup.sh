@@ -59,6 +59,12 @@ else
   ln -s ~/Code/dotfiles/cursor/commands $HOME/.cursor/commands
 fi
 
+# herdr keeps runtime state (sockets, logs, session) in ~/.config/herdr, so
+# only the script is symlinked, not the whole directory. Referenced by the
+# prefix+c keybinding in ~/.config/herdr/config.toml.
+mkdir -p $HOME/.config/herdr
+ln -sf ~/Code/dotfiles/herdr/new-worktree-tab.sh $HOME/.config/herdr/new-worktree-tab.sh
+
 # Install Sublime keybindings, if sublime is present
 SUBLIME_KEYMAPPING_DIR="$HOME/Library/Application Support/Sublime Text"
 SUBLIME_KEYMAPPING_FILE="$SUBLIME_KEYMAPPING_DIR/Default (OSX).sublime-keymap"
