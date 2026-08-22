@@ -382,3 +382,18 @@ When coordinating a swarm, you MUST monitor workers and review their output.
 After 3 review rejections, task is marked **blocked**. This signals an architectural problem, not "try harder."
 
 **NEVER skip the review step.** Workers complete faster when they get feedback.
+
+## PR Tracking
+
+The `@hcrosse/opencode-pr-tracker` plugin tracks GitHub PRs in the sidebar.
+
+When you encounter GitHub pull request URLs in tool results, messages, or conversation:
+- Call `pr_attach` with the URL to track it in the sidebar
+- This helps Jack keep visibility on PRs discussed in the session
+
+Available tools:
+- `pr_attach` - Add a PR to tracking (URL or number for current repo)
+- `pr_detach` - Stop tracking a PR
+- `pr_list` - List tracked PRs
+
+Slash commands: `/pr-attach`, `/pr-detach`, `/pr-open`, `/pr-sync`

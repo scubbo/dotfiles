@@ -1,0 +1,58 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "external_directory": {
+      "~/.robogoat/*": "allow"
+    }
+  },
+  // No Slack entry here on purpose. https://mcp.slack.com/mcp has no dynamic
+  // client registration, and the only pre-registered client available locally
+  // belongs to Anthropic's Claude app, whose redirect-URI allowlist we cannot
+  // edit. Slack access goes through `slack-cli` (@vercel/slack-cli) instead,
+  // which uses Vercel's own OAuth app and works from every harness.
+  "mcp": {
+    // Linear's official remote MCP server. Uses OAuth with dynamic client
+    // registration; run `opencode mcp auth linear` after a restart if tools
+    // report auth errors.
+    "linear": {
+      "type": "remote",
+      "url": "https://mcp.linear.app/mcp",
+      "enabled": true
+    },
+    // Google Calendar (Developer Preview). Inert until credentials are filled in
+    // and `enabled` flips to true -- Google requires a self-created OAuth client,
+    // there is no dynamic registration. To finish:
+    //   1. In a Google Cloud project, enable both `calendar-json.googleapis.com`
+    //      and `calendarmcp.googleapis.com`.
+    //   2. Configure the consent screen (Internal audience) and grant the three
+    //      read-only scopes listed below under Data Access.
+    //   3. Create an OAuth client of type *Web application*, and register this
+    //      exact authorized redirect URI:
+    //        http://127.0.0.1:19876/mcp/oauth/callback
+    //   4. Paste the client ID and secret here, set enabled to true, restart, then
+    //      run: opencode mcp auth calendar
+    "calendar": {
+      "type": "remote",
+      "url": "https://calendarmcp.googleapis.com/mcp/v1",
+      "enabled": false,
+      "oauth": {
+        "clientId": "REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID",
+        "clientSecret": "REPLACE_WITH_GOOGLE_OAUTH_CLIENT_SECRET",
+        "scope": "https://www.googleapis.com/auth/calendar.calendarlist.readonly https://www.googleapis.com/auth/calendar.events.readonly https://www.googleapis.com/auth/calendar.events.freebusy",
+        "callbackPort": 19876
+      }
+    }
+  },
+  "provider": {
+    "vercel": {
+      "options": {
+        "gateway": {
+          "caching": "auto"
+        }
+      }
+    }
+  },
+  "plugins": [
+    "@hcrosse/opencode-pr-tracker"
+  ]
+}
