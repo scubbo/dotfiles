@@ -102,6 +102,10 @@ funced () {
 	esac
 }
 
+function mc () {
+  mkdir "$1" && cd "$1";
+}
+
 
 source $HOME/bin/indexed-funcs.zsh
 
@@ -152,3 +156,9 @@ export PATH="$PATH:$HOME/.hades/bin"
 
 # openharness
 export PATH=/Users/jackjackson/.openharness/bin:$PATH
+
+# BEGIN: socket firewall aliases (managed by Iru)
+alias npm="sfw npm"
+alias pnpm="sfw pnpm"
+alias bun="sfw bun"
+# END: socket firewall aliases (managed by Iru)
