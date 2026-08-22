@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+#
+# spawn-worker: Spawn a colony worker in a NEW worktree and pane
+#
+# Usage: spawn-worker <worker-name> <task-description> [--repo <path>]
+#
+# This script ALWAYS:
+#   1. Creates a new git worktree (workers never work on main)
+#   2. Creates a new pane for the worker (never reuse existing panes)
+#   3. Starts an opencode agent in that pane
+#   4. Sends the initial task prompt
+#
+# The worker will join the community specified by $AGENT_COMMUNITY
+
+set -euo pipefail
+
+usage() {
+    echo "Usage: spawn-worker <worker-name> <task-description> [--repo <path>]"
+    echo ""
+    echo "Arguments:"
+    echo "  worker-name       Unique name for this worker (e.g., 'auth-refactor')"
+    echo "  task-description  What the worker should do"
+    echo ""
+    echo "Options:"
+    echo "  --repo <path>     Git repo to create worktree in (default: current directory)"
+    echo ""
+    echo "Environment:"
+    echo "  AGENT_COMMUNITY   Required. The community for the worker to join."
+    exit 1
+}
+
+if [[ $# -lt 2 ]]; then
+    usage
+fi
+
+WORKER_NAME="$1"
+TASK_DESC="$2"
+shift 2
+
+# Parse optional args
+REPO_PATH="$(pwd)"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --repo)
+            REPO_PATH="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+# Validate environment
+if [[ -z "${AGENT_COMMUNITY:-}" ]]; then
+    echo "ERROR: AGENT_COMMUNITY environment variable must be set"
+    exit 1
+fi
+
+# Validate repo path
+if [[ ! -d "$REPO_PATH/.git" ]]; then
+    echo "ERROR: $REPO_PATH is not a git repository"
+    exit 1
+fi
+
+echo "=== Spawning worker: $WORKER_NAME ==="
+echo "Community: $AGENT_COMMUNITY"
+echo "Repo: $REPO_PATH"
+echo "Task: $TASK_DESC"
+echo ""
+
+# Step 1: Create worktree
+BRANCH_NAME="worker/${WORKER_NAME}"
+echo "Creating worktree with branch: $BRANCH_NAME"
+
+WORKTREE_RESULT=$(herdr worktree create --cwd "$REPO_PATH" --branch "$BRANCH_NAME" --label "Worker: $WORKER_NAME" 2>&1)
+echo "$WORKTREE_RESULT"
+
+# Extract pane ID from result
+PANE_ID=$(echo "$WORKTREE_RESULT" | jq -r '.result.pane.pane_id // empty' 2>/dev/null || true)
+
+if [[ -z "$PANE_ID" ]]; then
+    echo "ERROR: Failed to extract pane ID from worktree creation"
+    echo "Raw result: $WORKTREE_RESULT"
+    exit 1
+fi
+
+echo "Worktree created. Pane ID: $PANE_ID"
+
+# Step 2: Start the agent
+echo "Starting opencode agent..."
+herdr agent start "$WORKER_NAME" --kind opencode --pane "$PANE_ID"
+
+# Give the agent a moment to initialize
+sleep 2
+
+# Step 3: Send the task prompt (NO --wait flag!)
+PROMPT="You are a colony worker. First, run these commands:
+
+agent-community join $AGENT_COMMUNITY
+agent-community claim $WORKER_NAME
+
+Then load the colony-worker skill.
+
+Your task: $TASK_DESC
+
+Report progress via the message bus. Post a 'completed' message when done."
+
+echo "Sending task prompt..."
+herdr agent prompt "$PANE_ID" "$PROMPT"
+
+echo ""
+echo "=== Worker spawned successfully ==="
+echo "Name: $WORKER_NAME"
+echo "Pane: $PANE_ID"
+echo "Community: $AGENT_COMMUNITY"
+echo ""
+echo "Monitor with: agent-community read --from $WORKER_NAME"
