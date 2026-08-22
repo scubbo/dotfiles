@@ -15,6 +15,8 @@ set re=0
 set tw=0
 set expandtab
 set tabstop=4
+" Always show filename
+set laststatus=2
 cmap w!! w !sudo tee > /dev/null %
 
 " Make deletion work properly inside screen
