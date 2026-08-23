@@ -162,3 +162,6 @@ alias npm="sfw npm"
 alias pnpm="sfw pnpm"
 alias bun="sfw bun"
 # END: socket firewall aliases (managed by Iru)
+
+# opencode
+export PATH=/Users/scubbo/.opencode/bin:$PATH
