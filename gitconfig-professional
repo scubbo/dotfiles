@@ -1,6 +1,16 @@
 [user]
 	name = Jack Jackson
 	email = jjackson2@legalzoom.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGDBOXtEhCb/ZMdKu1nq5igeFCbTu6R+1G2aIr60ghRu
 [pull]
     rebase = false
+# Signing is scoped to this config because the key lives in 1Password, which is only
+# installed on the work machine. Set globally, it fails every commit made anywhere else
+# with "cannot exec op-ssh-sign".
+[commit]
+	gpgsign = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
 

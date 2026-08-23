@@ -40,7 +40,6 @@
     ui = auto
 [commit]
     verbose = true
-	gpgsign = true
 [core]
 	pager = less -FMRiX
 	excludesfile = ~/.gitignore_global
@@ -86,7 +85,6 @@
 [user]
 	email = scubbojj@gmail.com
 	name = Jack Jackson
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGDBOXtEhCb/ZMdKu1nq5igeFCbTu6R+1G2aIr60ghRu
 [http]
 	postBuffer = 157286400
 [filter "lfs"]
@@ -94,7 +92,3 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[gpg]
-	format = ssh
-[gpg "ssh"]
-	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
