@@ -57,7 +57,8 @@ if [ -d "$dir" ]; then
 elif git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
   git -C "$repo" worktree add "$dir" "$branch" || die "git worktree add failed."
 else
-  git -C "$repo" worktree add -b "$branch" "$dir" || die "git worktree add failed."
+  git -C "$repo" fetch origin main || die "Could not update origin/main."
+  git -C "$repo" worktree add -b "$branch" "$dir" origin/main || die "git worktree add failed."
 fi
 
 herdr tab create --workspace "$ws_id" --cwd "$dir" --label "$topic" --focus >/dev/null ||
