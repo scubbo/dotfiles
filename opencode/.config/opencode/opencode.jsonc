@@ -52,7 +52,5 @@
       }
     }
   },
-  "plugins": [
-    "@hcrosse/opencode-pr-tracker"
-  ]
+  "plugins": []
 }
