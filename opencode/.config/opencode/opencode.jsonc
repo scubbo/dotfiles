@@ -41,6 +41,12 @@
         "scope": "https://www.googleapis.com/auth/calendar.calendarlist.readonly https://www.googleapis.com/auth/calendar.events.readonly https://www.googleapis.com/auth/calendar.events.freebusy",
         "callbackPort": 19876
       }
+    },
+    "servers": {
+      "notion": {
+        "type": "remote",
+        "url": "https://mcp.notion.com/mcp"
+      }
     }
   },
   "provider": {
@@ -52,5 +58,17 @@
       }
     }
   },
-  "plugins": []
+  "providers": {
+    "openai": {
+      // OpenAI abuse-detection identifier, merged into every request body
+      // sent to the openai provider (the AI SDK's
+      // `providerOptions.openai.safetyIdentifier` maps to this field).
+      "body": {
+        "safety_identifier": "scubbo"
+      }
+    }
+  },
+  "plugins": [
+    "opencode-prs"
+  ]
 }
