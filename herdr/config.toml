@@ -1,0 +1,31 @@
+onboarding = false
+
+[ui.sound]
+enabled = false
+
+[keys]
+prefix = "alt+z"
+previous_agent = "prefix+up"
+next_agent = "prefix+down"
+previous_tab = "prefix+left"
+next_tab = "prefix+right"
+new_tab = "prefix+shift+c"
+
+# prefix+c makes a git worktree and opens it as a tab in the current workspace.
+[[keys.command]]
+key = "prefix+c"
+type = "popup"
+command = "/Users/jackjackson/.config/herdr/new-worktree-tab.sh"
+width = "60%"
+height = "30%"
+description = "New worktree tab"
+
+[[keys.command]]
+key = "ctrl+shift+u"
+type = "plugin_action"
+command = "unread-marker.mark"
+description = "Toggle focused agent unread"
+
+[theme]
+name = "catppuccin"
+auto_switch = false
