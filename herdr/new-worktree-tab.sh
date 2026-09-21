@@ -54,11 +54,19 @@ dir="$WT_ROOT/$(basename "$repo")/$branch"
 
 if [ -d "$dir" ]; then
   : # already checked out; just open a tab on it
-elif git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
-  git -C "$repo" worktree add "$dir" "$branch" || die "git worktree add failed."
 else
-  git -C "$repo" fetch origin main || die "Could not update origin/main."
-  git -C "$repo" worktree add -b "$branch" "$dir" origin/main || die "git worktree add failed."
+  default_branch=$(git -C "$repo" symbolic-ref --quiet --short refs/remotes/origin/HEAD) ||
+    die "Could not determine origin's default branch."
+  default_branch=${default_branch#origin/}
+  git -C "$repo" pull origin "$default_branch" ||
+    die "Could not update origin/$default_branch."
+
+  if git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
+    git -C "$repo" worktree add "$dir" "$branch" || die "git worktree add failed."
+  else
+    git -C "$repo" worktree add -b "$branch" "$dir" "origin/$default_branch" ||
+      die "git worktree add failed."
+  fi
 fi
 
 herdr tab create --workspace "$ws_id" --cwd "$dir" --label "$topic" --focus >/dev/null ||
