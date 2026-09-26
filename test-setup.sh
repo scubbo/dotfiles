@@ -13,9 +13,12 @@ ln -s "$repo_root" "$test_home/Code/dotfiles"
 
 cat >"$fake_bin/hostname" <<'EOF'
 #!/bin/zsh
-print -r -- Mac.avril
+print -r -- Jacks-MacBook-Pro.local
 EOF
 chmod +x "$fake_bin/hostname"
+
+mkdir -p "$test_home/Code/dotfiles-private/.claude"
+print -r -- personal-claude-overlay >"$test_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
 
 mkdir -p "$test_home/.cursor/commands" \
   "$test_home/.config/herdr" \
@@ -51,6 +54,8 @@ assert_link() {
 
 assert_link "$test_home/.zshrc" "$repo_root/zshrc"
 assert_link "$test_home/.gitconfig" "$repo_root/gitconfig"
+assert_link "$test_home/.zshrc-local" "$repo_root/zshrc-local-mactop"
+assert_link "$test_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 assert_link "$test_home/.cursor/commands" "$repo_root/cursor/commands"
 assert_link "$test_home/.config/herdr/config.toml" "$repo_root/herdr/config.toml"
 assert_link "$test_home/Library/Application Support/Sublime Text/Default (OSX).sublime-keymap" "$repo_root/sublime-keymapping.json"
