@@ -60,9 +60,10 @@ else
 fi
 
 # herdr keeps runtime state (sockets, logs, session) in ~/.config/herdr, so
-# only the script is symlinked, not the whole directory. Referenced by the
-# prefix+c keybinding in ~/.config/herdr/config.toml.
+# durable configuration and scripts are symlinked individually rather than
+# linking the whole directory. Referenced by the prefix+c keybinding.
 mkdir -p $HOME/.config/herdr
+ln -sf ~/Code/dotfiles/herdr/config.toml $HOME/.config/herdr/config.toml
 ln -sf ~/Code/dotfiles/herdr/new-worktree-tab.sh $HOME/.config/herdr/new-worktree-tab.sh
 
 # Install Sublime keybindings, if sublime is present
