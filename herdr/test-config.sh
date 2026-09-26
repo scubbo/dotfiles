@@ -10,7 +10,7 @@ config="$repo_root/herdr/config.toml"
   exit 1
 }
 
-grep -Fxq 'ln -sf ~/Code/dotfiles/herdr/config.toml $HOME/.config/herdr/config.toml' "$repo_root/setup.sh" || {
+grep -Fxq "ensure_symlink \"\$repo_root/herdr/config.toml\" \"\$HOME/.config/herdr/config.toml\"" "$repo_root/setup.sh" || {
   echo "Expected setup.sh to link the Herdr configuration" >&2
   exit 1
 }
