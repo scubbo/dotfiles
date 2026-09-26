@@ -55,10 +55,10 @@ dir="$WT_ROOT/$(basename "$repo")/$branch"
 if [ -d "$dir" ]; then
   : # already checked out; just open a tab on it
 elif git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
-  git -C "$repo" worktree add "$dir" "$branch" || die "git worktree add failed."
+  git -C "$repo" -c checkout.workers=4 worktree add "$dir" "$branch" || die "git worktree add failed."
 else
   git -C "$repo" fetch origin main || die "Could not update origin/main."
-  git -C "$repo" worktree add -b "$branch" "$dir" origin/main || die "git worktree add failed."
+  git -C "$repo" -c checkout.workers=4 worktree add -b "$branch" "$dir" origin/main || die "git worktree add failed."
 fi
 
 herdr tab create --workspace "$ws_id" --cwd "$dir" --label "$topic" --focus >/dev/null ||
