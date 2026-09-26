@@ -67,7 +67,7 @@ ensure_file() {
 current_hostname=$(hostname)
 arch_name=$(uname -m)
 
-if [[ "$current_hostname" == "MacBookPro.avril" ]]; then
+if [[ "$current_hostname" == "MacBookPro.avril" || "$current_hostname" == "Jacks-MacBook-Pro.local" ]]; then
   MACHINE_TYPE="personal"
   local_zshrc="$repo_root/zshrc-local-mactop"
   local_gitconfig="$repo_root/gitconfig-personal"
