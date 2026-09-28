@@ -6,8 +6,33 @@ set -euo pipefail
 # Where tab-scoped worktrees live. Independent of herdr's [worktrees] directory,
 # which only governs the built-in worktree-as-workspace flow.
 WT_ROOT="${HERDR_TAB_WORKTREE_ROOT:-$HOME/.herdr/worktrees}"
+LOG="${HERDR_TAB_LOG:-$HOME/.config/herdr/new-worktree-tab.log}"
+
+mkdir -p "$(dirname "$LOG")"
+
+log() {
+  printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >>"$LOG"
+}
+
+run() {
+  local step=$1
+  shift
+
+  log "step=$step status=started"
+  if "$@" >>"$LOG" 2>&1; then
+    log "step=$step status=completed"
+  else
+    log "step=$step status=failed"
+    return 1
+  fi
+}
+
+outcome=failure
+trap 'status=$?; log "result=$outcome workspace_id=${ws_id:-} repo=${repo:-} branch=${branch:-} exit_code=$status dir=${dir:-}"' EXIT
+log "result=started"
 
 die() {
+  log "error=$*"
   printf '\n%s\n' "$*" >&2
   printf 'Press any key to close… '
   read -rsn1 || true
@@ -51,15 +76,28 @@ branch="${branch%-}"
 printf 'Branch: %s\n' "$branch"
 
 dir="$WT_ROOT/$(basename "$repo")/$branch"
+log "workspace_id=$ws_id repo=$repo branch=$branch dir=$dir"
 
 if [ -d "$dir" ]; then
   : # already checked out; just open a tab on it
-elif git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
-  git -C "$repo" -c checkout.workers=4 worktree add "$dir" "$branch" || die "git worktree add failed."
 else
-  git -C "$repo" fetch origin main || die "Could not update origin/main."
-  git -C "$repo" -c checkout.workers=4 worktree add -b "$branch" "$dir" origin/main || die "git worktree add failed."
+  default_branch=$(git -C "$repo" symbolic-ref --quiet --short refs/remotes/origin/HEAD) ||
+    die "Could not determine origin's default branch."
+  default_branch=${default_branch#origin/}
+  log "default_branch=$default_branch"
+  run update-parent git -C "$repo" pull origin "$default_branch" ||
+    die "Could not update origin/$default_branch."
+
+  if git -C "$repo" show-ref --verify --quiet "refs/heads/$branch"; then
+    run create-worktree git -C "$repo" -c checkout.workers=4 worktree add "$dir" "$branch" ||
+      die "git worktree add failed."
+  else
+    run create-worktree git -C "$repo" -c checkout.workers=4 worktree add -b "$branch" "$dir" "origin/$default_branch" ||
+      die "git worktree add failed."
+  fi
 fi
 
-herdr tab create --workspace "$ws_id" --cwd "$dir" --label "$topic" --focus >/dev/null ||
+run create-tab herdr tab create --workspace "$ws_id" --cwd "$dir" --label "$topic" --focus ||
   die "Worktree created at $dir but the tab could not be opened."
+
+outcome=success
