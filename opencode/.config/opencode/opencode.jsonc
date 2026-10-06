@@ -11,6 +11,12 @@
   // edit. Slack access goes through `slack-cli` (@vercel/slack-cli) instead,
   // which uses Vercel's own OAuth app and works from every harness.
   "mcp": {
+    "servers": {
+      "vgist": {
+        "type": "local",
+        "command": ["vgist", "mcp"]
+      }
+    },
     // Linear's official remote MCP server. Uses OAuth with dynamic client
     // registration; run `opencode mcp auth linear` after a restart if tools
     // report auth errors.
@@ -52,5 +58,7 @@
       }
     }
   },
-  "plugins": []
+  "plugins": [
+    "@hcrosse/opencode-pr-tracker"
+  ]
 }
