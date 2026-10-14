@@ -3,6 +3,7 @@
 !.github/
 !.agents/
 !.claude/
+!.agentic-project/
 .git
 .classpath
 .project
