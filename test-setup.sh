@@ -63,6 +63,15 @@ assert_link "$test_home/Library/Application Support/Code/User/settings.json" "$r
 assert_link "$test_home/Library/Application Support/Code/User/keybindings.json" "$repo_root/VSCode/keybindings.json"
 assert_link "$test_home/.vscode/extensions" "$repo_root/VSCode/extensions"
 
+cmp -s "$test_home/.claude/CLAUDE.md" "$test_home/.config/opencode/AGENTS.md" || {
+  print -u2 -- "Expected OpenCode instructions to match Claude instructions"
+  exit 1
+}
+[[ -n "$(tail -n 1 "$test_home/.claude/CLAUDE.md")" ]] || {
+  print -u2 -- "Expected generated instructions not to end with a blank line"
+  exit 1
+}
+
 backup_count=$(find "$test_home/.dotfiles-backups" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
 [[ "$backup_count" == 1 ]] || {
   print -u2 -- "Expected one backup directory"
