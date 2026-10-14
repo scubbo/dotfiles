@@ -159,4 +159,3 @@ YOU MUST follow this debugging framework for ANY technical issue:
 ## Shell and tooling preferences
 
 - Use `jq` for JSON processing in shell commands, not `python3 -m json.tool` or any Python-based JSON parsing
-

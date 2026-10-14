@@ -110,19 +110,27 @@ else
   fi
 fi
 
-mkdir -p "$HOME/.claude"
-claude_file=$(mktemp "$HOME/.claude/CLAUDE.md.XXXXXX")
-{
-  cat <<'EOF'
+generate_agent_instructions() {
+  local target=$1
+  local instructions_file
+
+  mkdir -p "${target:h}"
+  instructions_file=$(mktemp "$target.XXXXXX")
+  {
+    cat <<'EOF'
 <!-- GENERATED FILE - DO NOT EDIT DIRECTLY -->
 <!-- Edit CLAUDE-base.md and CLAUDE-work.md (or CLAUDE-personal.md) in dotfiles repo -->
 
 EOF
-  cat "$claude_overlay"
-  print
-  cat "$claude_base"
-} >"$claude_file"
-ensure_file "$claude_file" "$HOME/.claude/CLAUDE.md"
+    cat "$claude_overlay"
+    print
+    cat "$claude_base"
+  } >"$instructions_file"
+  ensure_file "$instructions_file" "$target"
+}
+
+generate_agent_instructions "$HOME/.claude/CLAUDE.md"
+generate_agent_instructions "$HOME/.config/opencode/AGENTS.md"
 
 ensure_symlink "$repo_root/cursor/commands" "$HOME/.cursor/commands"
 
