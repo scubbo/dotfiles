@@ -54,6 +54,7 @@ alias dr='docker compose run --rm'
 alias zed="open -a /Applications/Zed.app"
 # https://mackeeper.com/blog/flush-dns-cache-on-mac/ - though, note typo ("- flashcache")
 alias flush_cache="sudo dscacheutil -flushcache ;sudo killall -HUP mDNSResponder"
+alias oc="opencode2"
 
 function sgrep() {
         grep -ir "$1" . | grep -v -e 'build' -e '.git' -e '^Binary'
