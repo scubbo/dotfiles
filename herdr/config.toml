@@ -15,7 +15,7 @@ new_tab = "prefix+shift+c"
 [[keys.command]]
 key = "prefix+c"
 type = "popup"
-command = "/Users/jackjackson/.config/herdr/new-worktree-tab.sh"
+command = "$HOME/.config/herdr/new-worktree-tab.sh"
 width = "60%"
 height = "30%"
 description = "New worktree tab"
