@@ -24,8 +24,8 @@ The implementation branch is `wip/pr-workflow-skill`.
 - [x] Inspect the repository and ask about permission, placement, and monitoring.
 - [x] Read the OpenCode V2 skill guide and installed GitHub CLI help.
 - [x] Write instruction-contract tests and observe the expected failure.
-- [ ] Write the skill and its GitHub command reference.
-- [ ] Run tests and review every requested decision path.
+- [x] Write the skill and its GitHub command reference.
+- [x] Run tests and review every requested decision path.
 - [ ] Commit the skill locally and present it to Jack for review.
 - [ ] Ship the skill after Jack authorizes its push.
 - [ ] After shipping, delegate the database interview and design.
@@ -39,6 +39,17 @@ No live PR creation, comment, rerun, or push is required for these tests.
 Use a separate authorized PR to evaluate the complete workflow.
 The discovery test failed because `SKILL.md` did not exist.
 Captured output confirmed one assertion failure and exit code 1.
+The first full run exposed a test-parser defect.
+With DOTALL enabled, `.+` consumed all headings as a single name.
+Limit heading names to characters other than a newline.
+The existing `zsh test-setup.sh` test passed without output.
+After correcting the parser, all 17 instruction-contract tests passed.
+The shell parser reported no errors for any command example.
+Manual review covered the retry, flaky, known-failure, PR-caused, correct-review, incorrect-review, and ambiguous-review paths.
+Review also covered independent monitoring deadlines, attribution, stale results, duplicate responses, and permission boundaries.
+Five added assertions exposed gaps before their document fixes.
+Those assertions cover external pushes, write-time PR state, grouped retries, finding disposition, and workflow identity.
+All 17 tests passed after those fixes.
 
 ## Command findings
 

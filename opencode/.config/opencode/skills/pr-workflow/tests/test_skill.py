@@ -13,7 +13,7 @@ class SkillContractTests(unittest.TestCase):
         skill_path = SKILL_DIRECTORY / "SKILL.md"
         cls.skill = skill_path.read_text() if skill_path.is_file() else ""
         cls.sections = dict(
-            re.findall(r"^## (.+)\n(.*?)(?=^## |\Z)", cls.skill, re.M | re.S)
+            re.findall(r"^## ([^\n]+)\n(.*?)(?=^## |\Z)", cls.skill, re.M | re.S)
         )
         reference_path = SKILL_DIRECTORY / "references/github.md"
         cls.reference = reference_path.read_text() if reference_path.is_file() else ""
@@ -62,6 +62,7 @@ class SkillContractTests(unittest.TestCase):
             "each pushed update",
             "Do not reset",
             "Do not wait for CI",
+            "After any pushed update",
             "final",
         )
 
@@ -75,6 +76,7 @@ class SkillContractTests(unittest.TestCase):
             "updated_at",
             "already",
             "permission",
+            "Before each push or comment",
         )
 
     def test_ci_retries_once_without_code_changes(self):
@@ -86,6 +88,7 @@ class SkillContractTests(unittest.TestCase):
             "run ID",
             "attempt",
             "Do not retry repeatedly",
+            "Group failed jobs",
         )
 
     def test_passing_retry_gets_flaky_comment(self):
@@ -174,6 +177,7 @@ class SkillContractTests(unittest.TestCase):
             "ambiguities",
             "not green",
             "merged or closed",
+            "Address every collected finding",
         )
 
     def test_database_work_waits_for_shipping_and_interview(self):
@@ -192,6 +196,7 @@ class SkillContractTests(unittest.TestCase):
             "gh run rerun",
             "--failed",
             "--attempt",
+            "workflowDatabaseId",
             "--paginate",
             'pulls/$pr/comments',
             'pulls/$pr/reviews',
