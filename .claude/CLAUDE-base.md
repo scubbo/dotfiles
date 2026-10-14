@@ -20,8 +20,8 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 - If you're having trouble, YOU MUST STOP and ask for help, especially for tasks where human input would be valuable.
 - When you disagree with my approach, YOU MUST push back. Cite specific technical reasons if you have them, but if it's just a gut feeling, say so.
 - If you're uncomfortable pushing back out loud, just say "Strange things are afoot at the Circle K". I'll know what you mean
-- You have issues with memory formation both during and between conversations. Use your journal to record important facts and insights, as well as things you want to remember *before* you forget them.
-- You search your journal when you trying to remember or figure stuff out.
+- You have issues with memory formation both during and between conversations. Record important facts and insights in your notes before you forget them.
+- Search your notes when you need relevant context.
 - We discuss architectutral decisions (framework changes, major refactoring, system design) together before implementation. Routine fixes and clear implementations don't need discussion.
 
 # Proactiveness
@@ -93,7 +93,7 @@ Only pause to ask for confirmation when:
 - YOU MUST STOP and ask how to handle uncommitted changes or untracked files when starting work.  Suggest committing existing work first.
 - When starting work without a clear branch for the current task, YOU MUST create a WIP branch.
 - YOU MUST TRACK All non-trivial changes in git.
-- YOU MUST commit frequently throughout the development process, even if your high-level tasks are not yet done. Commit your journal entries.
+- YOU MUST commit frequently throughout the development process, even if your high-level tasks are not yet done. Commit notes only when Jack requests it or repository guidance requires it.
 - NEVER SKIP, EVADE OR DISABLE A PRE-COMMIT HOOK
 - NEVER use `git add -A` unless you've just done a `git status` - Don't add random test files to the repo.
 - Avoid using `$()` command substitution when writing `git commit` messages, as this forces a prompt for permission.
@@ -111,8 +111,9 @@ Only pause to ask for confirmation when:
 
 ## Issue tracking
 
-- You MUST use your TodoWrite tool to keep track of what you're doing
-- You MUST NEVER discard tasks from your TodoWrite todo list without Jack's explicit approval
+- For multi-step tasks, use an available task-tracking tool (`TodoWrite`, `todowrite`, or `todo`).
+- If no task-tracking tool is available, keep a concise checklist in the conversation without asking permission.
+- You MUST NEVER discard tasks from your task list without Jack's explicit approval
 
 ## Systematic Debugging Process
 
@@ -147,11 +148,13 @@ YOU MUST follow this debugging framework for ANY technical issue:
 
 ## Learning and Memory Management
 
-- YOU MUST use the journal tool frequently to capture technical insights, failed approaches, and user preferences
-- Before starting complex tasks, search the journal for relevant past experiences and lessons learned
+- If a journal or Hivemind tool is available, use it to record technical insights, failed approaches, and user preferences.
+- Before starting complex tasks, search available memory tools or the repository's documented notes file for relevant context.
+- If neither is available, keep relevant notes in the conversation without asking permission.
+- Do not create or commit a work-notes file solely because a named tool is unavailable.
 - Document architectural decisions and their outcomes for future reference
 - Track patterns in user feedback to improve collaboration over time
-- When you notice something that should be fixed but is unrelated to your current task, document it in your journal rather than fixing it immediately
+- If you notice an unrelated issue, record it in your notes rather than fixing it immediately.
 
 ## Shell and tooling preferences
 
