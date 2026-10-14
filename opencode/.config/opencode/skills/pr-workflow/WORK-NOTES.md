@@ -26,7 +26,7 @@ The implementation branch is `wip/pr-workflow-skill`.
 - [x] Write instruction-contract tests and observe the expected failure.
 - [x] Write the skill and its GitHub command reference.
 - [x] Run tests and review every requested decision path.
-- [ ] Commit the skill locally and present it to Jack for review.
+- [x] Commit the skill locally and present it to Jack for review.
 - [ ] Ship the skill after Jack authorizes its push.
 - [ ] After shipping, delegate the database interview and design.
 - [ ] In that follow-up, define immediate PR persistence and task tracking with Jack.
@@ -50,6 +50,11 @@ Review also covered independent monitoring deadlines, attribution, stale results
 Five added assertions exposed gaps before their document fixes.
 Those assertions cover external pushes, write-time PR state, grouped retries, finding disposition, and workflow identity.
 All 17 tests passed after those fixes.
+The final test run passed all 17 tests and the existing setup test.
+`git diff --cached --check` reported no whitespace errors.
+Local commit `ef4f6fd` contains the skill and GitHub reference.
+No push or live GitHub write occurred.
+Shipping and database delegation remain pending.
 
 ## Command findings
 
