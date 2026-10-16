@@ -63,6 +63,7 @@
     }
   },
   "plugins": [
-    "@hcrosse/opencode-pr-tracker"
+    "@hcrosse/opencode-pr-tracker",
+    "oc-todo@0.4.0"
   ]
 }
