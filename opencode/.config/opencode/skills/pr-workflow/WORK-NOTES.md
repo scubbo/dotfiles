@@ -53,8 +53,21 @@ All 17 tests passed after those fixes.
 The final test run passed all 17 tests and the existing setup test.
 `git diff --cached --check` reported no whitespace errors.
 Local commit `ef4f6fd` contains the skill and GitHub reference.
-No push or live GitHub write occurred.
-Shipping and database delegation remain pending.
+No push or live GitHub write occurred during the initial validation.
+Shipping and database delegation remain pending until review and testing.
+
+## PR publication
+
+On October 15, 2026, Jack explicitly requested a push and PR before the live workflow test.
+The worktree was clean before publication preparation.
+All 17 skill tests and the existing setup test passed again.
+The PR targets the confirmed default branch, `master`, in `scubbo/dotfiles`.
+The complete diff contains only the skill, command reference, tests, and work notes.
+The GraphQL repository and PR lookup commands reported API quota errors.
+The REST quota check and repository lookup succeeded.
+The REST lookup found no open PR for `scubbo:wip/pr-workflow-skill`.
+Use REST for this PR creation rather than repeating failing GraphQL requests.
+The monitoring test and database work remain deferred.
 
 ## Command findings
 
