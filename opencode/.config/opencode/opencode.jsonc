@@ -15,6 +15,10 @@
       "vgist": {
         "type": "local",
         "command": ["vgist", "mcp"]
+      },
+      "datadog": {
+        "type": "remote",
+        "url": "https://mcp.datadoghq.com/api/unstable/mcp-server/mcp?toolsets=core"
       }
     },
     // Linear's official remote MCP server. Uses OAuth with dynamic client
