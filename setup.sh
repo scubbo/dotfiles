@@ -161,6 +161,10 @@ ensure_symlink "$repo_root/cursor/commands" "$HOME/.cursor/commands"
 ensure_symlink "$repo_root/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 ensure_symlink "$repo_root/herdr/new-worktree-tab.sh" "$HOME/.config/herdr/new-worktree-tab.sh"
 
+rex_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/rex"
+ensure_symlink "$repo_root/rex/init.lua" "$rex_config_dir/init.lua"
+ensure_symlink "$repo_root/rex/new-worktree-tab.sh" "$rex_config_dir/new-worktree-tab.sh"
+
 # Install Sublime keybindings, if sublime is present
 sublime_keymapping_dir="$HOME/Library/Application Support/Sublime Text"
 sublime_keymapping_file="$sublime_keymapping_dir/Default (OSX).sublime-keymap"

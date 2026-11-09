@@ -35,6 +35,7 @@ mkdir -p "$test_home/.cursor/commands" \
   "$test_home/.codex" \
   "$test_home/.config/opencode" \
   "$test_home/.config/herdr" \
+  "$test_home/.config/rex" \
   "$test_home/Library/Application Support/Sublime Text" \
   "$test_home/Library/Application Support/Code/User" \
   "$test_home/.vscode/extensions"
@@ -47,6 +48,9 @@ print -r -- user-cursor-command >"$test_home/.cursor/commands/user.md"
 print -r -- user-herdr-config >"$test_home/.config/herdr/config.toml"
 print -r -- Herdr-runtime-state >"$test_home/.config/herdr/session.json"
 print -r -- Herdr-runtime-log >"$test_home/.config/herdr/herdr-server.log"
+print -r -- user-rex-config >"$test_home/.config/rex/init.lua"
+print -r -- user-rex-helper >"$test_home/.config/rex/new-worktree-tab.sh"
+print -r -- Rex-runtime-log >"$test_home/.config/rex/new-worktree-tab.log"
 print -r -- user-sublime-keybinding >"$test_home/Library/Application Support/Sublime Text/Default (OSX).sublime-keymap"
 print -r -- user-vs-code-settings >"$test_home/Library/Application Support/Code/User/settings.json"
 print -r -- user-vs-code-keybindings >"$test_home/Library/Application Support/Code/User/keybindings.json"
@@ -74,6 +78,8 @@ assert_link "$test_home/.zshrc-local" "$repo_root/zshrc-local-mactop"
 assert_link "$test_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 assert_link "$test_home/.cursor/commands" "$repo_root/cursor/commands"
 assert_link "$test_home/.config/herdr/config.toml" "$repo_root/herdr/config.toml"
+assert_link "$test_home/.config/rex/init.lua" "$repo_root/rex/init.lua"
+assert_link "$test_home/.config/rex/new-worktree-tab.sh" "$repo_root/rex/new-worktree-tab.sh"
 assert_link "$test_home/Library/Application Support/Sublime Text/Default (OSX).sublime-keymap" "$repo_root/sublime-keymapping.json"
 assert_link "$test_home/Library/Application Support/Code/User/settings.json" "$repo_root/VSCode/settings.json"
 assert_link "$test_home/Library/Application Support/Code/User/keybindings.json" "$repo_root/VSCode/keybindings.json"
@@ -133,6 +139,9 @@ grep -Fxq user-cursor-command "$backup_dir/.cursor/commands/user.md"
 grep -Fxq user-herdr-config "$backup_dir/.config/herdr/config.toml"
 grep -Fxq Herdr-runtime-state "$test_home/.config/herdr/session.json"
 grep -Fxq Herdr-runtime-log "$test_home/.config/herdr/herdr-server.log"
+grep -Fxq user-rex-config "$backup_dir/.config/rex/init.lua"
+grep -Fxq user-rex-helper "$backup_dir/.config/rex/new-worktree-tab.sh"
+grep -Fxq Rex-runtime-log "$test_home/.config/rex/new-worktree-tab.log"
 grep -Fxq user-sublime-keybinding "$backup_dir/Library/Application Support/Sublime Text/Default (OSX).sublime-keymap"
 grep -Fxq user-vs-code-settings "$backup_dir/Library/Application Support/Code/User/settings.json"
 grep -Fxq user-vs-code-keybindings "$backup_dir/Library/Application Support/Code/User/keybindings.json"
@@ -161,6 +170,8 @@ work_output=$(HOME="$work_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME=Jacks-MacBo
 }
 assert_link "$work_home/.zshrc-local" "$repo_root/zshrc-work-mactop"
 assert_link "$work_home/.gitconfig-local" "$repo_root/gitconfig-professional"
+assert_link "$work_home/custom-config/rex/init.lua" "$repo_root/rex/init.lua"
+assert_link "$work_home/custom-config/rex/new-worktree-tab.sh" "$repo_root/rex/new-worktree-tab.sh"
 assert_instructions "$repo_root/.claude/CLAUDE-work.md" \
   "$work_home/custom-fx/AGENTS.md" \
   "$work_home/custom-codex/AGENTS.md" \
