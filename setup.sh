@@ -178,7 +178,6 @@ vscode_app_dir="$HOME/Library/Application Support/Code/User"
 if [[ -d "$vscode_app_dir" ]]; then
   ensure_symlink "$repo_root/VSCode/settings.json" "$vscode_app_dir/settings.json"
   ensure_symlink "$repo_root/VSCode/keybindings.json" "$vscode_app_dir/keybindings.json"
-  ensure_symlink "$repo_root/VSCode/extensions" "$HOME/.vscode/extensions"
 else
   print -- "VSCode is not installed - settings and keybindings not installed"
 fi

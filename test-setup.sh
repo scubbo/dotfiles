@@ -83,7 +83,11 @@ assert_link "$test_home/.config/rex/new-worktree-tab.sh" "$repo_root/rex/new-wor
 assert_link "$test_home/Library/Application Support/Sublime Text/Default (OSX).sublime-keymap" "$repo_root/sublime-keymapping.json"
 assert_link "$test_home/Library/Application Support/Code/User/settings.json" "$repo_root/VSCode/settings.json"
 assert_link "$test_home/Library/Application Support/Code/User/keybindings.json" "$repo_root/VSCode/keybindings.json"
-assert_link "$test_home/.vscode/extensions" "$repo_root/VSCode/extensions"
+[[ -d "$test_home/.vscode/extensions" && ! -L "$test_home/.vscode/extensions" ]] || {
+  print -u2 -- "Expected setup to leave the extension directory unchanged"
+  exit 1
+}
+grep -Fxq user-extension "$test_home/.vscode/extensions/user-extension.txt"
 
 assert_instructions() {
   local overlay=$1
@@ -145,7 +149,10 @@ grep -Fxq Rex-runtime-log "$test_home/.config/rex/new-worktree-tab.log"
 grep -Fxq user-sublime-keybinding "$backup_dir/Library/Application Support/Sublime Text/Default (OSX).sublime-keymap"
 grep -Fxq user-vs-code-settings "$backup_dir/Library/Application Support/Code/User/settings.json"
 grep -Fxq user-vs-code-keybindings "$backup_dir/Library/Application Support/Code/User/keybindings.json"
-grep -Fxq user-extension "$backup_dir/.vscode/extensions/user-extension.txt"
+[[ ! -e "$backup_dir/.vscode/extensions" ]] || {
+  print -u2 -- "Expected setup not to back up the extension directory"
+  exit 1
+}
 
 second_output=$(HOME="$test_home" PATH="$fake_bin:$PATH" zsh "$repo_root/setup.sh" 2>&1)
 [[ "$second_output" != *'WARNING: Backed up'* ]] || {
@@ -211,7 +218,8 @@ assert_instructions "$repo_root/.claude/CLAUDE-work.md" \
 }
 
 personal_home="$test_dir/personal-home"
-mkdir -p "$personal_home/.config/dotfiles" "$personal_home/Code/dotfiles-private/.claude"
+mkdir -p "$personal_home/.config/dotfiles" "$personal_home/Code/dotfiles-private/.claude" \
+  "$personal_home/Library/Application Support/Code/User"
 print -r -- personal >"$personal_home/.config/dotfiles/machine-type"
 print -r -- personal-overlay >"$personal_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
 personal_output=$(HOME="$personal_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME=Mac.avril \
@@ -221,6 +229,10 @@ personal_output=$(HOME="$personal_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME=Mac
 }
 assert_link "$personal_home/.zshrc-local" "$repo_root/zshrc-local-mactop"
 assert_link "$personal_home/.gitconfig-local" "$repo_root/gitconfig-personal"
+[[ ! -e "$personal_home/.vscode/extensions" && ! -L "$personal_home/.vscode/extensions" ]] || {
+  print -u2 -- "Expected setup not to create an extension directory"
+  exit 1
+}
 assert_instructions "$personal_home/Code/dotfiles-private/.claude/CLAUDE-personal.md" \
   "$personal_home/.fx/AGENTS.md" \
   "$personal_home/.codex/AGENTS.md" \
