@@ -66,23 +66,42 @@ ensure_file() {
 # Detect machine type
 current_hostname=$(hostname)
 arch_name=$(uname -m)
+machine_type_file="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/machine-type"
 
-if [[ "$current_hostname" == "MacBookPro.avril" || "$current_hostname" == "Jacks-MacBook-Pro.local" ]]; then
+# A local role file keeps machine selection independent of hostnames.
+if [[ -f "$machine_type_file" ]]; then
+  MACHINE_TYPE=$(<"$machine_type_file")
+elif [[ "$current_hostname" == "MacBookPro.avril" || "$current_hostname" == "Jacks-MacBook-Pro.local" ]]; then
   MACHINE_TYPE="personal"
-  local_zshrc="$repo_root/zshrc-local-mactop"
-  local_gitconfig="$repo_root/gitconfig-personal"
-elif [[ "$current_hostname" == "Mac.avril" ]]; then
+elif [[ "$current_hostname" == "Mac.avril" || "$current_hostname" == "Jacks-MacBook-Pro-2.local" ]]; then
   MACHINE_TYPE="work"
-  local_zshrc="$repo_root/zshrc-work-mactop"
-  local_gitconfig="$repo_root/gitconfig-professional"
 elif [[ "$arch_name" == "aarch64" ]]; then
   MACHINE_TYPE="personal"
-  local_zshrc="$repo_root/zshrc-local-pi"
-  local_gitconfig="$repo_root/gitconfig-personal"
 else
   print -u2 -- "Unrecognized machine: hostname=$current_hostname, arch=$arch_name"
+  print -u2 -- "Set $machine_type_file to work or personal."
   exit 1
 fi
+
+case "$MACHINE_TYPE" in
+  work)
+    local_zshrc="$repo_root/zshrc-work-mactop"
+    local_gitconfig="$repo_root/gitconfig-professional"
+    ;;
+  personal)
+    if [[ "$arch_name" == "aarch64" ]]; then
+      local_zshrc="$repo_root/zshrc-local-pi"
+    else
+      local_zshrc="$repo_root/zshrc-local-mactop"
+    fi
+    local_gitconfig="$repo_root/gitconfig-personal"
+    ;;
+  *)
+    print -u2 -- "Invalid machine type '$MACHINE_TYPE' in $machine_type_file."
+    print -u2 -- "Set $machine_type_file to work or personal."
+    exit 1
+    ;;
+esac
 
 # Install dotfiles
 ensure_symlink "$local_zshrc" "$HOME/.zshrc-local"
@@ -96,15 +115,15 @@ ensure_symlink "$repo_root/bin" "$HOME/bin"
 ensure_symlink "$repo_root/screenrc" "$HOME/.screenrc"
 ensure_symlink "$repo_root/tmux.conf" "$HOME/.tmux.conf"
 
-# Generate ~/.claude/CLAUDE.md from base + machine-specific overlay
-claude_base="$repo_root/.claude/CLAUDE-base.md"
+# Generate user-level AGENTS.md files from base + machine-specific overlay
+agent_base="$repo_root/.claude/CLAUDE-base.md"
 
 if [[ "$MACHINE_TYPE" == "work" ]]; then
-  claude_overlay="$repo_root/.claude/CLAUDE-work.md"
+  agent_overlay="$repo_root/.claude/CLAUDE-work.md"
 else
-  claude_overlay="$HOME/Code/dotfiles-private/.claude/CLAUDE-personal.md"
-  if [[ ! -f "$claude_overlay" ]]; then
-    print -u2 -- "ERROR: Personal machine detected but $claude_overlay not found."
+  agent_overlay="$HOME/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+  if [[ ! -f "$agent_overlay" ]]; then
+    print -u2 -- "ERROR: Personal machine detected but $agent_overlay not found."
     print -u2 -- "Please clone dotfiles-private repo to $HOME/Code/dotfiles-private"
     exit 1
   fi
@@ -122,15 +141,17 @@ generate_agent_instructions() {
 <!-- Edit CLAUDE-base.md and CLAUDE-work.md (or CLAUDE-personal.md) in dotfiles repo -->
 
 EOF
-    cat "$claude_overlay"
+    cat "$agent_overlay"
     print
-    cat "$claude_base"
+    cat "$agent_base"
   } >"$instructions_file"
   ensure_file "$instructions_file" "$target"
 }
 
-generate_agent_instructions "$HOME/.claude/CLAUDE.md"
-generate_agent_instructions "$HOME/.config/opencode/AGENTS.md"
+# Agents share the AGENTS.md format, but use separate global instruction paths.
+generate_agent_instructions "${FX_HOME:-$HOME/.fx}/AGENTS.md"
+generate_agent_instructions "${CODEX_HOME:-$HOME/.codex}/AGENTS.md"
+generate_agent_instructions "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/AGENTS.md"
 
 ensure_symlink "$repo_root/cursor/commands" "$HOME/.cursor/commands"
 
