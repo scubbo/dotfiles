@@ -166,3 +166,6 @@ alias bun="sfw bun"
 
 # opencode
 export PATH=/Users/scubbo/.opencode/bin:$PATH
+
+# Added by MDM Homebrew Postinstall Automation
+eval "$(/opt/homebrew/bin/brew shellenv)"
