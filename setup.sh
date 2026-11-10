@@ -182,4 +182,64 @@ else
   print -- "VSCode is not installed - settings and keybindings not installed"
 fi
 
+# agent-friction scans agent session logs for recurring friction. It is built
+# from source and scheduled weekly, so it needs both Go and launchd.
+install_agent_friction() {
+  local binary="$HOME/.local/bin/agent-friction"
+  local fx_sessions="${FX_HOME:-$HOME/.fx}/sessions/v2"
+  local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/agent-friction"
+  local label=com.scubbo.agent-friction
+  local plist="$HOME/Library/LaunchAgents/$label.plist"
+  local plist_file
+
+  mkdir -p "${binary:h}" "$state_dir/logs" "${plist:h}"
+  (cd "$repo_root/agent-friction" && go build -o "$binary" .)
+  print -- "Built $binary"
+
+  # launchd does not read shell startup files, so the job names every path in full.
+  plist_file=$(mktemp "$plist.XXXXXX")
+  cat >"$plist_file" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>$label</string>
+	<key>ProcessType</key>
+	<string>Background</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/sh</string>
+		<string>-c</string>
+		<string>'$binary' scan --fx-sessions '$fx_sessions' --state '$state_dir' &amp;&amp; /usr/bin/osascript -e 'display notification "A new digest is in $state_dir/digests" with title "Agent friction"'</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>$state_dir/logs/stderr.log</string>
+	<key>StandardOutPath</key>
+	<string>$state_dir/logs/stdout.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>9</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+		<key>Weekday</key>
+		<integer>1</integer>
+	</dict>
+</dict>
+</plist>
+EOF
+  ensure_file "$plist_file" "$plist"
+
+  launchctl bootout "gui/$UID/$label" 2>/dev/null || true
+  launchctl bootstrap "gui/$UID" "$plist" ||
+    print -u2 -- "WARNING: Could not schedule $label. Run: launchctl bootstrap gui/$UID $plist"
+}
+
+if [[ "$(uname -s)" == "Darwin" ]] && (( $+commands[go] )); then
+  install_agent_friction
+else
+  print -- "Go or launchd is not available - agent-friction not installed"
+fi
+
 print -- "Dotfiles installed."

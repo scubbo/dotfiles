@@ -25,7 +25,18 @@ else
   /usr/bin/uname "$@"
 fi
 EOF
-chmod +x "$fake_bin/hostname" "$fake_bin/uname"
+# Setup schedules a launchd job. Recording the calls keeps the tests from changing the real schedule.
+launchctl_log="$test_dir/launchctl.log"
+cat >"$fake_bin/launchctl" <<EOF
+#!/bin/zsh
+print -r -- "\$*" >>"$launchctl_log"
+EOF
+chmod +x "$fake_bin/hostname" "$fake_bin/uname" "$fake_bin/launchctl"
+
+# Each test home would otherwise start with an empty Go build cache.
+if (( $+commands[go] )); then
+  export GOCACHE=$(go env GOCACHE)
+fi
 
 mkdir -p "$test_home/Code/dotfiles-private/.claude"
 print -r -- personal-claude-overlay >"$test_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
@@ -127,6 +138,55 @@ assert_instructions "$test_home/Code/dotfiles-private/.claude/CLAUDE-personal.md
   exit 1
 }
 
+assert_agent_friction() {
+  local home=$1
+  local fx_sessions=$2
+  local binary="$home/.local/bin/agent-friction"
+  local label=com.scubbo.agent-friction
+  local plist="$home/Library/LaunchAgents/$label.plist"
+  local job_command usage
+
+  usage=$("$binary" 2>&1) && {
+    print -u2 -- "Expected $binary to reject a call without a command"
+    exit 1
+  }
+  [[ "$usage" == *'usage: agent-friction'* ]] || {
+    print -u2 -- "Expected $binary to be the agent-friction program, got: $usage"
+    exit 1
+  }
+
+  plutil -lint "$plist" >/dev/null || {
+    print -u2 -- "Expected $plist to be a valid property list"
+    exit 1
+  }
+  [[ "$(plutil -extract Label raw "$plist")" == "$label" && \
+    "$(plutil -extract StartCalendarInterval.Weekday raw "$plist")" == 1 ]] || {
+    print -u2 -- "Expected $plist to schedule $label weekly"
+    exit 1
+  }
+  job_command=$(plutil -extract ProgramArguments.2 raw "$plist")
+  [[ "$job_command" == "'$binary' scan --fx-sessions '$fx_sessions' --state '$home/.local/state/agent-friction' && "*'display notification'* ]] || {
+    print -u2 -- "Expected the scheduled job to scan $fx_sessions and then notify, got: $job_command"
+    exit 1
+  }
+  [[ -d "$home/.local/state/agent-friction/logs" ]] || {
+    print -u2 -- "Expected a log directory for the scheduled job"
+    exit 1
+  }
+  grep -Fxq "bootstrap gui/$UID $plist" "$launchctl_log" || {
+    print -u2 -- "Expected setup to load $plist into launchd"
+    exit 1
+  }
+}
+
+if (( $+commands[go] )); then
+  assert_agent_friction "$test_home" "$test_home/.fx/sessions/v2"
+  [[ "$(head -n 1 "$launchctl_log")" == "bootout gui/$UID/com.scubbo.agent-friction" ]] || {
+    print -u2 -- "Expected setup to unload the scheduled job before loading it"
+    exit 1
+  }
+fi
+
 backup_count=$(find "$test_home/.dotfiles-backups" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
 [[ "$backup_count" == 1 ]] || {
   print -u2 -- "Expected one backup directory"
@@ -184,6 +244,9 @@ assert_instructions "$repo_root/.claude/CLAUDE-work.md" \
   "$work_home/custom-codex/AGENTS.md" \
   "$work_home/custom-config/opencode/AGENTS.md"
 grep -Fxq user-claude-instructions "$work_home/.claude/CLAUDE.md"
+if (( $+commands[go] )); then
+  assert_agent_friction "$work_home" "$work_home/custom-fx/sessions/v2"
+fi
 [[ ! -e "$work_home/.fx/AGENTS.md" && ! -e "$work_home/.codex/AGENTS.md" && \
   ! -e "$work_home/.config/opencode/AGENTS.md" ]] || {
   print -u2 -- "Expected agent configuration directory overrides to replace default paths"
@@ -246,6 +309,20 @@ pi_output=$(HOME="$pi_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME=pi.local TEST_A
 assert_link "$pi_home/.zshrc-local" "$repo_root/zshrc-local-pi"
 assert_link "$pi_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 
+without_go_home="$test_dir/without-go-home"
+mkdir -p "$without_go_home/Code/dotfiles-private/.claude"
+print -r -- overlay >"$without_go_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+without_go_output=$(HOME="$without_go_home" PATH="$fake_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
+  zsh "$repo_root/setup.sh" 2>&1) || {
+  print -u2 -- "$without_go_output"
+  exit 1
+}
+[[ "$without_go_output" == *'agent-friction not installed'* && \
+  ! -e "$without_go_home/.local/bin/agent-friction" && ! -e "$without_go_home/Library/LaunchAgents" ]] || {
+  print -u2 -- "Expected setup to skip agent-friction when Go is missing"
+  exit 1
+}
+
 invalid_home="$test_dir/invalid-home"
 mkdir -p "$invalid_home/.config/dotfiles"
 for invalid_type in unknown ''; do
@@ -272,4 +349,4 @@ fi
   exit 1
 }
 
-print -- "Setup tests passed (machine selection, instructions, directory overrides, backups, idempotence)."
+print -- "Setup tests passed (machine selection, instructions, directory overrides, backups, idempotence, agent-friction)."
