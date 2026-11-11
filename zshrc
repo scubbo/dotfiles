@@ -142,6 +142,9 @@ echo ""
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# Must come after adding `$HOME/.local/bin` to `$PATH`
+source $HOME/bin/friction-tracker-reminder.zsh
+
 # opencode
 export PATH=/Users/jackjackson/.opencode/bin:$PATH
 

@@ -25,7 +25,46 @@ else
   /usr/bin/uname "$@"
 fi
 EOF
-chmod +x "$fake_bin/hostname" "$fake_bin/uname"
+# Setup schedules a launchd job. Recording the calls keeps the tests from changing the real schedule.
+launchctl_log="$test_dir/launchctl.log"
+cat >"$fake_bin/launchctl" <<EOF
+#!/bin/zsh
+print -r -- "\$*" >>"$launchctl_log"
+EOF
+
+# Setup builds friction-tracker from a clone of its repository. This program stands in for it.
+stand_in_source="$test_dir/stand-in-friction-tracker"
+mkdir -p "$stand_in_source"
+print -r -- 'module github.com/scubbo/friction-tracker' >"$stand_in_source/go.mod"
+cat >"$stand_in_source/main.go" <<'EOF'
+package main
+
+import "fmt"
+
+func main() { fmt.Println("stand-in friction-tracker") }
+EOF
+
+# Cloning needs network access and credentials, so a clone copies the stand-in instead.
+git_log="$test_dir/git.log"
+cat >"$fake_bin/git" <<EOF
+#!/bin/zsh
+print -r -- "\$*" >>"$git_log"
+if [[ "\$1" != clone ]]; then
+  exec /usr/bin/git "\$@"
+fi
+if [[ -n "\$TEST_GIT_CLONE_FAILS" ]]; then
+  print -u2 -- "fatal: Could not read from remote repository."
+  exit 128
+fi
+mkdir -p "\${3:h}"
+cp -R "$stand_in_source" "\$3"
+EOF
+chmod +x "$fake_bin/hostname" "$fake_bin/uname" "$fake_bin/launchctl" "$fake_bin/git"
+
+# Each test home would otherwise start with an empty Go build cache.
+if (( $+commands[go] )); then
+  export GOCACHE=$(go env GOCACHE)
+fi
 
 mkdir -p "$test_home/Code/dotfiles-private/.claude"
 print -r -- personal-claude-overlay >"$test_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
@@ -55,6 +94,8 @@ print -r -- user-sublime-keybinding >"$test_home/Library/Application Support/Sub
 print -r -- user-vs-code-settings >"$test_home/Library/Application Support/Code/User/settings.json"
 print -r -- user-vs-code-keybindings >"$test_home/Library/Application Support/Code/User/keybindings.json"
 print -r -- user-extension >"$test_home/.vscode/extensions/user-extension.txt"
+cp -R "$stand_in_source" "$test_home/Code/friction-tracker"
+print -r -- work-in-progress >"$test_home/Code/friction-tracker/notes.txt"
 
 output=$(HOME="$test_home" PATH="$fake_bin:$PATH" zsh "$repo_root/setup.sh" 2>&1)
 [[ "$output" == *'WARNING: Backed up'* ]] || {
@@ -127,6 +168,57 @@ assert_instructions "$test_home/Code/dotfiles-private/.claude/CLAUDE-personal.md
   exit 1
 }
 
+assert_friction_tracker() {
+  local home=$1
+  local fx_sessions=$2
+  local binary="$home/.local/bin/friction-tracker"
+  local state_dir="$home/.local/state/friction-tracker"
+  local label=com.scubbo.friction-tracker
+  local plist="$home/Library/LaunchAgents/$label.plist"
+  local expected_arguments
+
+  [[ "$("$binary")" == 'stand-in friction-tracker' ]] || {
+    print -u2 -- "Expected $binary to be built from $home/Code/friction-tracker"
+    exit 1
+  }
+  plutil -lint "$plist" >/dev/null || {
+    print -u2 -- "Expected $plist to be a valid property list"
+    exit 1
+  }
+  [[ "$(plutil -extract Label raw "$plist")" == "$label" && \
+    "$(plutil -extract StartCalendarInterval.Weekday raw "$plist")" == 1 && \
+    "$(plutil -extract StartCalendarInterval.Hour raw "$plist")" == 9 ]] || {
+    print -u2 -- "Expected $plist to schedule $label on Mondays at 09:00"
+    exit 1
+  }
+  expected_arguments=$(jq -cn --arg binary "$binary" --arg sessions "$fx_sessions" --arg state "$state_dir" \
+    '[$binary, "scan", "--fx-sessions", $sessions, "--state", $state]')
+  [[ "$(plutil -extract ProgramArguments json -o - "$plist" | jq -c .)" == "$expected_arguments" ]] || {
+    print -u2 -- "Expected the scheduled job to run $expected_arguments"
+    exit 1
+  }
+  [[ "$(plutil -extract StandardErrorPath raw "$plist")" == "$state_dir/logs/stderr.log" && -d "$state_dir/logs" ]] || {
+    print -u2 -- "Expected the scheduled job to log to $state_dir/logs"
+    exit 1
+  }
+  grep -Fxq "bootstrap gui/$UID $plist" "$launchctl_log" || {
+    print -u2 -- "Expected setup to load $plist into launchd"
+    exit 1
+  }
+}
+
+if (( $+commands[go] )); then
+  assert_friction_tracker "$test_home" "$test_home/.fx/sessions/v2"
+  [[ "$(head -n 1 "$launchctl_log")" == "bootout gui/$UID/com.scubbo.friction-tracker" ]] || {
+    print -u2 -- "Expected setup to unload the scheduled job before loading it"
+    exit 1
+  }
+  grep -Fxq work-in-progress "$test_home/Code/friction-tracker/notes.txt" && [[ ! -e "$git_log" ]] || {
+    print -u2 -- "Expected setup to build an existing clone without running git in it"
+    exit 1
+  }
+fi
+
 backup_count=$(find "$test_home/.dotfiles-backups" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
 [[ "$backup_count" == 1 ]] || {
   print -u2 -- "Expected one backup directory"
@@ -184,6 +276,13 @@ assert_instructions "$repo_root/.claude/CLAUDE-work.md" \
   "$work_home/custom-codex/AGENTS.md" \
   "$work_home/custom-config/opencode/AGENTS.md"
 grep -Fxq user-claude-instructions "$work_home/.claude/CLAUDE.md"
+if (( $+commands[go] )); then
+  assert_friction_tracker "$work_home" "$work_home/custom-fx/sessions/v2"
+  grep -Fxq "clone git@github.com:scubbo/friction-tracker.git $work_home/Code/friction-tracker" "$git_log" || {
+    print -u2 -- "Expected setup to clone friction-tracker when there is no clone"
+    exit 1
+  }
+fi
 [[ ! -e "$work_home/.fx/AGENTS.md" && ! -e "$work_home/.codex/AGENTS.md" && \
   ! -e "$work_home/.config/opencode/AGENTS.md" ]] || {
   print -u2 -- "Expected agent configuration directory overrides to replace default paths"
@@ -246,6 +345,37 @@ pi_output=$(HOME="$pi_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME=pi.local TEST_A
 assert_link "$pi_home/.zshrc-local" "$repo_root/zshrc-local-pi"
 assert_link "$pi_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 
+without_go_home="$test_dir/without-go-home"
+mkdir -p "$without_go_home/Code/dotfiles-private/.claude"
+print -r -- overlay >"$without_go_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+without_go_output=$(HOME="$without_go_home" PATH="$fake_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
+  zsh "$repo_root/setup.sh" 2>&1) || {
+  print -u2 -- "$without_go_output"
+  exit 1
+}
+[[ "$without_go_output" == *'friction-tracker not installed'* && \
+  ! -e "$without_go_home/Code/friction-tracker" && ! -e "$without_go_home/Library/LaunchAgents" ]] || {
+  print -u2 -- "Expected setup to skip friction-tracker when Go is missing"
+  exit 1
+}
+
+if (( $+commands[go] )); then
+  without_access_home="$test_dir/without-access-home"
+  mkdir -p "$without_access_home/Code/dotfiles-private/.claude"
+  print -r -- overlay >"$without_access_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+  without_access_output=$(HOME="$without_access_home" PATH="$fake_bin:$PATH" TEST_GIT_CLONE_FAILS=1 \
+    zsh "$repo_root/setup.sh" 2>&1) || {
+    print -u2 -- "Expected setup to finish when friction-tracker cannot be cloned: $without_access_output"
+    exit 1
+  }
+  [[ "$without_access_output" == *'WARNING: Could not clone friction-tracker'* && \
+    "$without_access_output" == *'Dotfiles installed.'* && \
+    ! -e "$without_access_home/.local/bin/friction-tracker" && ! -e "$without_access_home/Library/LaunchAgents" ]] || {
+    print -u2 -- "Expected a warning and no scheduled job when friction-tracker cannot be cloned"
+    exit 1
+  }
+fi
+
 invalid_home="$test_dir/invalid-home"
 mkdir -p "$invalid_home/.config/dotfiles"
 for invalid_type in unknown ''; do
@@ -272,4 +402,4 @@ fi
   exit 1
 }
 
-print -- "Setup tests passed (machine selection, instructions, directory overrides, backups, idempotence)."
+print -- "Setup tests passed (machine selection, instructions, directory overrides, backups, idempotence, friction-tracker)."

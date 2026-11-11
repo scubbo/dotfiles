@@ -182,4 +182,77 @@ else
   print -- "VSCode is not installed - settings and keybindings not installed"
 fi
 
+# friction-tracker writes a weekly digest of friction that keeps happening in
+# agent sessions. It is built from a clone of its repository and scheduled with
+# launchd, so it needs Go and macOS.
+install_friction_tracker() {
+  local source_dir="$HOME/Code/friction-tracker"
+  local binary="$HOME/.local/bin/friction-tracker"
+  local fx_sessions="${FX_HOME:-$HOME/.fx}/sessions/v2"
+  local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/friction-tracker"
+  local label=com.scubbo.friction-tracker
+  local plist="$HOME/Library/LaunchAgents/$label.plist"
+  local plist_file
+
+  # An existing clone is built as it is, because it may hold work in progress.
+  if [[ ! -d "$source_dir" ]]; then
+    git clone git@github.com:scubbo/friction-tracker.git "$source_dir" || {
+      print -u2 -- "WARNING: Could not clone friction-tracker to $source_dir - friction-tracker not installed"
+      return
+    }
+  fi
+
+  mkdir -p "${binary:h}" "$state_dir/logs" "${plist:h}"
+  (cd "$source_dir" && go build -o "$binary" .)
+  print -- "Built $binary"
+
+  # launchd does not read shell startup files, so the job names every path in full.
+  plist_file=$(mktemp "$plist.XXXXXX")
+  cat >"$plist_file" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>$label</string>
+	<key>ProcessType</key>
+	<string>Background</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>$binary</string>
+		<string>scan</string>
+		<string>--fx-sessions</string>
+		<string>$fx_sessions</string>
+		<string>--state</string>
+		<string>$state_dir</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>$state_dir/logs/stderr.log</string>
+	<key>StandardOutPath</key>
+	<string>$state_dir/logs/stdout.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>9</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+		<key>Weekday</key>
+		<integer>1</integer>
+	</dict>
+</dict>
+</plist>
+EOF
+  ensure_file "$plist_file" "$plist"
+
+  launchctl bootout "gui/$UID/$label" 2>/dev/null || true
+  launchctl bootstrap "gui/$UID" "$plist" ||
+    print -u2 -- "WARNING: Could not schedule $label. Run: launchctl bootstrap gui/$UID $plist"
+}
+
+if [[ "$(uname -s)" == "Darwin" ]] && (( $+commands[go] )); then
+  install_friction_tracker
+else
+  print -- "Go or launchd is not available - friction-tracker not installed"
+fi
+
 print -- "Dotfiles installed."
