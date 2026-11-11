@@ -160,3 +160,4 @@ YOU MUST follow this debugging framework for ANY technical issue:
 ## Shell and tooling preferences
 
 - Use `jq` for JSON processing in shell commands, not `python3 -m json.tool` or any Python-based JSON parsing
+- NEVER name a shell variable `path` (for example `for path in ...`). The shell is zsh, which ties `path` to `PATH`, so assigning it replaces the command search path and later commands fail with `command not found`. Use a name like `file` instead.
