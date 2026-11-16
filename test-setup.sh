@@ -289,13 +289,18 @@ fi
   exit 1
 }
 
-work_output=$(HOME="$work_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME=Mac.avril \
-  FX_HOME="$work_home/custom-fx" CODEX_HOME="$work_home/custom-codex" \
-  XDG_CONFIG_HOME="$work_home/custom-config" zsh "$repo_root/setup.sh" 2>&1)
-[[ "$work_output" != *'WARNING: Backed up'* ]] || {
-  print -u2 -- "Expected both work hostnames to select the same dotfiles"
-  exit 1
-}
+for work_hostname in Mac.avril jacks-mbp-2; do
+  work_output=$(HOME="$work_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME="$work_hostname" \
+    FX_HOME="$work_home/custom-fx" CODEX_HOME="$work_home/custom-codex" \
+    XDG_CONFIG_HOME="$work_home/custom-config" zsh "$repo_root/setup.sh" 2>&1) || {
+    print -u2 -- "$work_output"
+    exit 1
+  }
+  [[ "$work_output" != *'WARNING: Backed up'* ]] || {
+    print -u2 -- "Expected every work hostname to select the same dotfiles, but $work_hostname did not"
+    exit 1
+  }
+done
 
 mkdir -p "$work_home/custom-config/dotfiles"
 print -r -- work >"$work_home/custom-config/dotfiles/machine-type"
