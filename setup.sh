@@ -73,7 +73,7 @@ if [[ -f "$machine_type_file" ]]; then
   MACHINE_TYPE=$(<"$machine_type_file")
 elif [[ "$current_hostname" == "MacBookPro.avril" || "$current_hostname" == "Jacks-MacBook-Pro.local" ]]; then
   MACHINE_TYPE="personal"
-elif [[ "$current_hostname" == "Mac.avril" || "$current_hostname" == "Jacks-MacBook-Pro-2.local" ]]; then
+elif [[ "$current_hostname" == "Mac.avril" || "$current_hostname" == "Jacks-MacBook-Pro-2.local" || "$current_hostname" == "jacks-mbp-2" ]]; then
   MACHINE_TYPE="work"
 elif [[ "$arch_name" == "aarch64" ]]; then
   MACHINE_TYPE="personal"
