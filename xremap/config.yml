@@ -1,0 +1,7 @@
+keymap:
+  - name: Firefox tab navigation
+    application:
+      only: firefox
+    remap:
+      Alt-Shift-RightBrace: Ctrl-Tab
+      Alt-Shift-LeftBrace: Ctrl-Shift-Tab
