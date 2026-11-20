@@ -5,11 +5,15 @@
 { config, pkgs, ... }:
 
 {
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       # https://github.com/FrameworkComputer/linux-docs
-      <nixos-hardware/framework/13-inch/13th-gen-intel>
     ];
 
   # Use the systemd-boot EFI boot loader.

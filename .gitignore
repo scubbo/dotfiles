@@ -7,3 +7,5 @@ bin/subl
 # ...but do still ignore .DS_STORE
 .DS_STORE
 opencode/.config/opencode/AGENTS.md
+# Nixos noise
+nixos-config/result
