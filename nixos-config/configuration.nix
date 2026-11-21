@@ -104,7 +104,7 @@
   # XRemap configuration
   services.desktopManager.gnome.extraGSettingsOverrides = ''
     [org.gnome.shell]
-    enabled-extensions=['xremap@k0kubun.com']
+    enabled-extensions=['xremap@k0kubun.com','appindicatorsupport@rgcjonas.gmail.com']
   '';
   hardware.uinput.enable = true;
   boot.kernelModules = [ "uinput" ];
@@ -114,6 +114,14 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput.enable = true;
+
+  systemd.user.services.dropbox = {
+    description = "Dropbox";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+
+    serviceConfig.ExecStart = "${pkgs.dropbox}/bin/dropbox";
+  };
 
   systemd.user.services.xremap = {
     description = "Keyboard shortcut remapping";
@@ -137,6 +145,7 @@
     description = "Jack Jackson";
     extraGroups = [ "networkmanager" "input" "wheel" ];
     packages = with pkgs; [
+      dropbox
       signal-desktop
       vim-full
     ];
@@ -152,6 +161,7 @@
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
     git
+    gnomeExtensions.appindicator
     gnomeExtensions.xremap
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2
     wl-clipboard
