@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, pkgs, ... }:
+{ config, pkgs, llm-agents, ... }:
 
 {
   nix.settings.experimental-features = [
@@ -153,6 +153,7 @@
   environment.systemPackages = with pkgs; [
     git
     gnomeExtensions.xremap
+    llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2
     wl-clipboard
     xremap.gnome
   ];

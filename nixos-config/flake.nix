@@ -2,14 +2,20 @@
   description = "My NixOS configuration";
 
   inputs = {
-    # Replace with the branch matching your NixOS release.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+
+    # AI Coding agent packages, including opencode2
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = { self, nixpkgs, nixos-hardware, ... }: {
+  outputs = { self, nixpkgs, nixos-hardware, llm-agents, ... }: {
     nixosConfigurations.phi = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+
+      specialArgs = {
+        inherit llm-agents;
+      };
 
       modules = [
         ./configuration.nix
