@@ -30,6 +30,13 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Mount the NFS share on access, without blocking boot when it is unavailable.
+  fileSystems."/mnt/galactus-nfs" = {
+    device = "galactus.avril:/mnt/high-resiliency/manual-nfs";
+    fsType = "nfs";
+    options = [ "nofail" "_netdev" "x-systemd.automount" ];
+  };
+
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
@@ -78,6 +85,8 @@
 
   # https://wiki.nixos.org/wiki/Tailscale#Native_nftables_Support_(Modern_Setup)
   services.tailscale.enable = true;
+  services.tailscale.useRoutingFeatures = "client";
+  services.tailscale.extraSetFlags = [ "--accept-routes" ];
   networking.nftables.enable = true;
   networking.firewall = {
     enable = true;
