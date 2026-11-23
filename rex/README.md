@@ -21,13 +21,15 @@ the same tab. The original agent keeps running. `rex do fork_agent_pane` does
 the same from a terminal in the pane.
 
 The copy ends at the last finished turn. A turn that is still running stays
-out of the copy, and so do the conversation's subagents. The action fails
-without opening a pane when the pane doesn't run fx, when the conversation
-has no finished turn, or when one fx has several conversations open.
+out of the copy. If no turn has finished, the copy is an empty conversation.
+The copy includes the subagents that fx can copy at that point, and fx adds
+`(fork)` to its title. The action fails without opening a pane when the pane
+doesn't run fx, when fx has not saved a conversation, or when one fx has
+several conversations open.
 
-fx has no command that forks a conversation from outside its shell. The action
-uses `fx session recover`, which copies a conversation into a new one and
-leaves the source unchanged.
+The action uses `fx session fork`, which copies a conversation from outside
+the fx shell and leaves the source unchanged. With an fx that lacks that
+command, the action fails and tells you to upgrade fx.
 
 ## Tests
 
@@ -45,8 +47,8 @@ from a Rex terminal. It opens a temporary session, checks which tab receives
 keyboard input, and returns to the calling tab. It removes its temporary
 session and Git repositories when it finishes.
 
-`smoke_fork_agent_pane.py` needs a running Rex server and a signed-in fx. It
-runs fx with a temporary `FX_HOME`, so it doesn't read or change your saved
-conversations. It sends one short model request to create the conversation
-that it forks. It removes its temporary session and fx profile when it
-finishes.
+`smoke_fork_agent_pane.py` needs a running Rex server and a signed-in fx that
+has `fx session fork`. It runs fx with a temporary `FX_HOME`, so it doesn't
+read or change your saved conversations. It sends one short model request to
+create the conversation that it forks. It removes its temporary session and
+fx profile when it finishes.

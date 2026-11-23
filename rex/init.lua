@@ -56,9 +56,9 @@ rex.action{
 
 rex.bind("alt+z>c", "new_worktree_tab")
 
--- fx forks a conversation only from inside its own shell, where the fork
--- replaces the original on screen. Copying it from outside keeps the original
--- running and puts the copy beside it.
+-- A fork made inside the fx shell replaces the original on screen. A fork made
+-- from outside with `fx session fork` keeps the original running, so the copy
+-- can go beside it.
 rex.action{
   name = "fork_agent_pane",
   title = "Fork Agent into Split Pane",
@@ -95,7 +95,8 @@ rex.action{
     if not fx_home then error("The fx in this pane has no saved conversation yet.", 0) end
 
     local fx_errors = {
-      SessionRecoveryBoundaryInvalid = "fx has not finished a turn in this conversation, so there is nothing to fork yet.",
+      -- An fx without `session fork` reads "fork" as a malformed session id.
+      InvalidSessionDetailArgs = "The fx in this pane has no `session fork` command. Upgrade fx.",
     }
     local function fx(...)
       local result, exec_err = rex.exec({ agent.path, ... }, { env = { FX_HOME = fx_home }, timeout = 20 })
@@ -117,10 +118,11 @@ rex.action{
     end
     if not source_id then error("fx does not list this pane's conversation as open.", 0) end
 
-    -- `session recover` is the fx command that copies a conversation from
-    -- outside its shell. The copy ends at the last finished turn, so a turn
-    -- that is still running stays out of it and is not run a second time.
-    local fork_id = fx("session", "recover", "--id", source_id, "--json").recovered_id
+    -- `session fork` reads the conversation without taking its lock, so the
+    -- agent in this pane is not interrupted. The copy ends at the last
+    -- finished turn, so a turn that is still running stays out of it and is
+    -- not run a second time.
+    local fork_id = fx("session", "fork", "--id", source_id, "--json").fork_id
 
     local command = { agent.path, "--resume", fork_id }
     if fx_home ~= os.getenv("HOME") .. "/.fx" then
