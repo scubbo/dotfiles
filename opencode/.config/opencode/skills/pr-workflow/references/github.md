@@ -76,12 +76,12 @@ gh pr checks "$pr" --repo "$repo" \
   --json name,state,bucket,link,workflow,startedAt,completedAt
 ```
 
-Do not add `--required` because that can hide Vade or other optional steps.
+Do not add `--required` because that can hide a review bot's check or other optional steps.
 The documented pending exit code is 8.
 A failing check can also produce a nonzero exit code with usable JSON.
 Read the JSON, stderr, and exit code together.
 Do not hide authentication or transport errors with `|| true`.
-Avoid a blocking `--watch` while the independent `hacker` window is active.
+Avoid a blocking `--watch` while the independent review window is active.
 
 Find `run_id` from the Actions link in the PR's checks.
 Make sure that the run belongs to this PR and revision.
@@ -132,12 +132,13 @@ gh api --paginate "repos/$repo/pulls/$pr/reviews?per_page=100"
 gh api --paginate "repos/$repo/issues/$pr/comments?per_page=100"
 ```
 
-Read `user.login`, IDs, bodies, timestamps, links, and commit or location fields where available.
+Read `user.login`, `user.type`, IDs, bodies, timestamps, links, and commit or location fields where available.
+A bot account has a `user.type` of `Bot`.
 Review objects also contain their submitted time and reviewed commit.
 `gh pr view --comments` alone does not include every inline review observation.
-Findings can also appear in Vade's logs, summary, or annotations.
+Findings can also appear in the logs, summary, or annotations of a review bot's check.
 
-For Vade's check output, identify the check's actual commit from the PR's status data.
+For a review bot's check output, identify the check's actual commit from the PR's status data.
 Set `check_sha` to that commit, including a synthetic merge commit when applicable.
 Set `check_repo` to the verified repository that owns the check.
 List its checks and select `check_id` using the name and actual App identity:
@@ -150,7 +151,7 @@ gh api --paginate "repos/$check_repo/check-runs/$check_id/annotations?per_page=1
 
 Read the check's `output.summary`, `output.text`, `details_url`, and annotations even when its conclusion is successful.
 An Actions step can put its review output in the run logs instead.
-Do not interpret a completed Vade check as proof that it has no findings.
+Do not interpret a completed review check as proof that it has no findings.
 
 ## Replies and comments
 

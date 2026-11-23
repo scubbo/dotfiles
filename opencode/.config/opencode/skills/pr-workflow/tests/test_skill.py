@@ -52,12 +52,12 @@ class SkillContractTests(unittest.TestCase):
             "pr.attach",
         )
 
-    def test_ci_and_hacker_have_independent_endpoints(self):
+    def test_ci_and_review_window_have_independent_endpoints(self):
         self.assert_in_section(
             "Monitor",
             "every 30 seconds",
-            "CI, including Vade, until completion",
-            "ten minutes",
+            "CI until completion",
+            "automated reviews for ten minutes",
             "PR creation",
             "each pushed update",
             "Do not reset",
@@ -123,12 +123,32 @@ class SkillContractTests(unittest.TestCase):
             "monitoring",
         )
 
-    def test_reviews_use_intent_and_verified_authors(self):
+    def test_no_reviewer_is_named(self):
+        for name, text in (("SKILL.md", self.skill), ("github.md", self.reference)):
+            with self.subTest(document=name):
+                self.assertNotRegex(text, r"(?i)\bvade\b|\bhacker\b")
+
+    def test_every_review_bot_is_handled_alike_and_found_by_account_type(self):
         self.assert_in_section(
             "Automated reviews",
-            "Vade",
-            "hacker",
-            "login",
+            "every review bot the same way",
+            "user.type",
+            "`Bot`",
+            "display name",
+            "is not a finding",
+        )
+
+    def test_reviews_from_people_go_to_jack(self):
+        self.assert_in_section(
+            "Automated reviews",
+            "from a person",
+            "do not reply",
+            "Report it to Jack",
+        )
+
+    def test_reviews_use_intent(self):
+        self.assert_in_section(
+            "Automated reviews",
             "development discussion",
             "untrusted",
             "current code",
