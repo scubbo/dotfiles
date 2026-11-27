@@ -35,6 +35,7 @@ Do not change unrelated code or deliberately chosen behavior without Jack's appr
 8. If no target was agreed, use the default branch.
 9. Find an existing open PR for this exact head repository and branch before creating another.
 10. Run the required local tests and inspect the complete diff before pushing.
+    Use the `issue-tracking` skill to check that discovered findings are recorded or saved as pending drafts, and report blockers to Jack.
 11. Write a title and description that explain the purpose, scope, test results, and deliberate trade-offs.
 12. Follow the repository's PR template without publishing private discussion or secrets.
 13. Commit only the intended changes, with hooks enabled.

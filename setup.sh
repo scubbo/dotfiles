@@ -143,6 +143,7 @@ required_sources=(
   "$repo_root/cursor/commands" "$repo_root/herdr/config.toml"
   "$repo_root/herdr/new-worktree-tab.sh" "$repo_root/rex/init.lua"
   "$repo_root/rex/new-worktree-tab.sh"
+  "$repo_root/skills/issue-tracking/SKILL.md"
 )
 if [[ -d "$HOME/Library/Application Support/Sublime Text" ]]; then
   required_sources+=("$repo_root/sublime-keymapping.json")
@@ -197,6 +198,11 @@ generate_agent_instructions "${CODEX_HOME:-$HOME/.codex}/AGENTS.md"
 generate_agent_instructions "${XDG_CONFIG_HOME:-$HOME/.config}/opencode/AGENTS.md"
 
 ensure_symlink "$repo_root/cursor/commands" "$HOME/.cursor/commands"
+skill_target="$HOME/.agents/skills/issue-tracking/SKILL.md"
+mkdir -p "${skill_target:h}"
+skill_file=$(mktemp "$skill_target.XXXXXX")
+cat "$repo_root/skills/issue-tracking/SKILL.md" >"$skill_file"
+ensure_file "$skill_file" "$skill_target"
 
 # herdr keeps runtime state (sockets, logs, session) in ~/.config/herdr, so
 # durable configuration and scripts are symlinked individually rather than

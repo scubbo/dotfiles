@@ -75,6 +75,7 @@ mkdir -p "$test_home/Code/dotfiles-private/.claude"
 print -r -- personal-claude-overlay >"$test_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
 
 mkdir -p "$test_home/.cursor/commands" \
+  "$test_home/.agents/skills/issue-tracking" \
   "$test_home/.fx" \
   "$test_home/.codex" \
   "$test_home/.config/opencode" \
@@ -84,6 +85,8 @@ mkdir -p "$test_home/.cursor/commands" \
   "$test_home/Library/Application Support/Code/User" \
   "$test_home/.vscode/extensions"
 print -r -- user-zshrc >"$test_home/.zshrc"
+print -r -- user-skill >"$test_home/.agents/skills/issue-tracking/SKILL.md"
+print -r -- user-reference >"$test_home/.agents/skills/issue-tracking/user.md"
 print -r -- user-fx-instructions >"$test_home/.fx/AGENTS.md"
 print -r -- user-codex-instructions >"$test_home/.codex/AGENTS.md"
 print -r -- user-opencode-instructions >"$test_home/.config/opencode/AGENTS.md"
@@ -128,6 +131,12 @@ fi
 assert_link "$test_home/.zshrc-local" "$personal_zshrc"
 assert_link "$test_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 assert_link "$test_home/.cursor/commands" "$repo_root/cursor/commands"
+[[ ! -L "$test_home/.agents/skills/issue-tracking" ]] &&
+  cmp -s "$repo_root/skills/issue-tracking/SKILL.md" "$test_home/.agents/skills/issue-tracking/SKILL.md" || {
+  print -u2 -- "Expected the shared skill to be installed inside the home directory"
+  exit 1
+}
+grep -Fxq user-reference "$test_home/.agents/skills/issue-tracking/user.md"
 assert_link "$test_home/.config/herdr/config.toml" "$repo_root/herdr/config.toml"
 assert_link "$test_home/.config/rex/init.lua" "$repo_root/rex/init.lua"
 assert_link "$test_home/.config/rex/new-worktree-tab.sh" "$repo_root/rex/new-worktree-tab.sh"
@@ -244,6 +253,7 @@ grep -Fxq user-codex-instructions "$backup_dir/.codex/AGENTS.md"
 grep -Fxq user-opencode-instructions "$backup_dir/.config/opencode/AGENTS.md"
 [[ -L "$backup_dir/.gitconfig" ]]
 grep -Fxq user-cursor-command "$backup_dir/.cursor/commands/user.md"
+grep -Fxq user-skill "$backup_dir/.agents/skills/issue-tracking/SKILL.md"
 grep -Fxq user-herdr-config "$backup_dir/.config/herdr/config.toml"
 grep -Fxq Herdr-runtime-state "$test_home/.config/herdr/session.json"
 grep -Fxq Herdr-runtime-log "$test_home/.config/herdr/herdr-server.log"
@@ -283,6 +293,7 @@ assert_link "$work_home/.zshrc-local" "$repo_root/zshrc-work-mactop"
 assert_link "$work_home/.gitconfig-local" "$repo_root/gitconfig-professional"
 assert_link "$work_home/custom-config/rex/init.lua" "$repo_root/rex/init.lua"
 assert_link "$work_home/custom-config/rex/new-worktree-tab.sh" "$repo_root/rex/new-worktree-tab.sh"
+cmp -s "$repo_root/skills/issue-tracking/SKILL.md" "$work_home/.agents/skills/issue-tracking/SKILL.md"
 assert_instructions "$repo_root/.claude/CLAUDE-work.md" \
   "$work_home/custom-fx/AGENTS.md" \
   "$work_home/custom-codex/AGENTS.md" \
@@ -367,12 +378,15 @@ assert_link "$linux_home/.zshrc-local" "$repo_root/zshrc-local-linux"
 assert_link "$linux_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 
 if [[ "$system_name" == Linux ]]; then
-  startup_output=$(HOME="$linux_home" PATH="$fake_bin:$PATH" zsh -f -i -c '
+  startup_command='
     source "$HOME/.zshrc"
     [[ "$CDPATH" == "$HOME/Code:." && "$VISUAL" == vim ]] || exit 1
     (( $+functions[compdef] )) || exit 1
-    [[ "$(bindkey "^I")" == *expand-or-complete* ]] || exit 1
-  ' 2>&1) || {
+    tab_binding=$(bindkey "^I")
+    [[ "$tab_binding" == *expand-or-complete* || "$tab_binding" == *fzf-completion* ]] || exit 1
+  '
+  startup_output=$(HOME="$linux_home" PATH="$fake_bin:$PATH" \
+    script -q -e -c "zsh -f -i -c ${(q)startup_command}" /dev/null </dev/null 2>&1) || {
     print -u2 -- "Linux shell startup failed: $startup_output"
     exit 1
   }
@@ -517,7 +531,7 @@ grep -Fxq original-zshrc "$invalid_overlay_home/.zshrc"
 incomplete_repo="$test_dir/incomplete-repo"
 mkdir -p "$incomplete_repo"
 cp -R "$repo_root/setup.sh" "$repo_root/.claude" "$repo_root/cursor" \
-  "$repo_root/herdr" "$repo_root/rex" "$repo_root/envFolder" "$repo_root/bin" \
+  "$repo_root/herdr" "$repo_root/rex" "$repo_root/envFolder" "$repo_root/bin" "$repo_root/skills" \
   "$repo_root/zshrc-work-mactop" "$repo_root/gitconfig-professional" "$repo_root/zshrc" \
   "$repo_root/gitignore_global" "$repo_root/gitconfig" "$repo_root/vimrc" \
   "$repo_root/screenrc" "$repo_root/tmux.conf" "$incomplete_repo"
@@ -534,6 +548,20 @@ fi
 [[ "$missing_output" == *'rex/new-worktree-tab.sh'* && ! -e "$missing_source_home/.dotfiles-backups" && \
   ! -e "$missing_source_home/.zshrc-local" ]] || {
   print -u2 -- "Expected a missing source to fail before making changes"
+  exit 1
+}
+grep -Fxq original-zshrc "$missing_source_home/.zshrc"
+
+cp "$repo_root/rex/new-worktree-tab.sh" "$incomplete_repo/rex/new-worktree-tab.sh"
+mv "$incomplete_repo/skills/issue-tracking/SKILL.md" "$test_dir/removed-skill.md"
+if missing_output=$(HOME="$missing_source_home" PATH="$fake_bin:$PATH" \
+  "$incomplete_repo/setup.sh" 2>&1); then
+  print -u2 -- "Expected a missing shared skill to stop setup"
+  exit 1
+fi
+[[ "$missing_output" == *'skills/issue-tracking/SKILL.md'* && \
+  ! -e "$missing_source_home/.dotfiles-backups" && ! -e "$missing_source_home/.zshrc-local" ]] || {
+  print -u2 -- "Expected a missing shared skill to fail before making changes"
   exit 1
 }
 grep -Fxq original-zshrc "$missing_source_home/.zshrc"
