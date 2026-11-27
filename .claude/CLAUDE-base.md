@@ -112,6 +112,9 @@ Only pause to ask for confirmation when:
 
 ## Issue tracking
 
+- Never create a `TODO.md` in a `vercel/` repository; update one only if it already exists.
+- Use the `issue-tracking` skill to record discovered small, unambiguous bugs, limitations, and intended improvements in the appropriate tracker, searching for duplicates first. Never create a GitHub issue without Jack's explicit approval of its content.
+- Before creating a pull request, use `issue-tracking` to check that discoveries have been tracked or preserved as pending drafts and blockers reported. A pull request description is not a substitute for tracking.
 - For multi-step tasks, use an available task-tracking tool (`TodoWrite`, `todowrite`, or `todo`).
 - If no task-tracking tool is available, keep a concise checklist in the conversation without asking permission.
 - You MUST NEVER discard tasks from your task list without Jack's explicit approval
