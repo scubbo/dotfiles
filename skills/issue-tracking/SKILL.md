@@ -9,6 +9,7 @@ Record each small, unambiguous bug, limitation, or intended improvement discover
 
 ## Choose and search the destination
 
+- Never create a `TODO.md` in a `vercel/` repository; update one only if it already exists. Apply this restriction when working in a fork targeting a `vercel/` repository too. If repository ownership is unclear, establish it or ask Jack before creating a `TODO.md`. Otherwise, use another appropriate tracker or a pending draft.
 - For issues in the code being worked on, use the repository's `TODO.md` or an existing project tracker according to repository instructions and the finding's scope. Search the destination, including relevant closed entries, before adding anything. If there is no matching entry, add one; otherwise add the new observation to the existing entry. Do not reopen or change the status of a closed entry without discussing it with Jack.
 - For tooling or agent-workflow friction, use `friction-tracker` when it supports searching and recording observations. Inspect its documented commands and existing findings first. Do not edit its database directly or invent commands. If it cannot record the observation, save a local pending draft as described below, tell Jack it is not yet in the tracker, and ask how to proceed.
 - When a GitHub issue is appropriate, search existing issues and the local outbox before drafting. If a matching issue exists, draft the new observation as an update to that issue rather than creating a duplicate.

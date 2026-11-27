@@ -7,6 +7,12 @@ unset FX_HOME CODEX_HOME XDG_CONFIG_HOME TEST_HOSTNAME TEST_ARCH TEST_OS
 export TEST_REAL_UNAME="$(command -v uname)"
 system_name=$("$TEST_REAL_UNAME" -s)
 repo_root=${0:A:h}
+for instruction_file in "$repo_root/.claude/CLAUDE-base.md" "$repo_root/skills/issue-tracking/SKILL.md"; do
+  grep -Fq 'Never create a `TODO.md` in a `vercel/` repository' "$instruction_file" || {
+    print -u2 -- "Expected the Vercel TODO restriction in $instruction_file"
+    exit 1
+  }
+done
 test_dir=$(mktemp -d)
 trap 'rm -rf "$test_dir"' EXIT
 
