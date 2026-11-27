@@ -146,6 +146,7 @@
     extraGroups = [ "networkmanager" "input" "wheel" ];
     packages = with pkgs; [
       dropbox
+      obsidian
       signal-desktop
       vim-full
     ];
