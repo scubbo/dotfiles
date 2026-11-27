@@ -4,6 +4,7 @@
 # functions, options, key bindings, etc.
 #
 
+DOTFILES_USE_SOCKET_FIREWALL=0
 source ~/.zshrc-local
 
 # Make user-installed tools available to optional integrations below.
@@ -166,11 +167,13 @@ export PATH="$PATH:$HOME/.hades/bin"
 
 export PATH="$HOME/.openharness/bin:$HOME/.opencode/bin:$PATH"
 
+if [[ "$DOTFILES_USE_SOCKET_FIREWALL" == 1 ]]; then
 # BEGIN: socket firewall aliases (managed by Iru)
 alias npm="sfw npm"
 alias pnpm="sfw pnpm"
 alias bun="sfw bun"
 # END: socket firewall aliases (managed by Iru)
+fi
 
 # Added by MDM Homebrew Postinstall Automation
 if [[ -x /opt/homebrew/bin/brew ]]; then
