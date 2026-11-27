@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 @art = (
 # lil ncat buddies
@@ -1301,4 +1301,3 @@ EOA
 
 EOA
 ) and print $art[rand @art]
-

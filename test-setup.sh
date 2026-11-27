@@ -1,9 +1,11 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
 set -euo pipefail
 
-unset FX_HOME CODEX_HOME XDG_CONFIG_HOME TEST_HOSTNAME TEST_ARCH
+unset FX_HOME CODEX_HOME XDG_CONFIG_HOME TEST_HOSTNAME TEST_ARCH TEST_OS
 
+export TEST_REAL_UNAME="$(command -v uname)"
+system_name=$("$TEST_REAL_UNAME" -s)
 repo_root=${0:A:h}
 test_dir=$(mktemp -d)
 trap 'rm -rf "$test_dir"' EXIT
@@ -12,23 +14,26 @@ test_home="$test_dir/home"
 fake_bin="$test_dir/bin"
 mkdir -p "$test_home/Code" "$fake_bin"
 ln -s "$repo_root" "$test_home/Code/dotfiles"
+ln -s "$(command -v zsh)" "$fake_bin/zsh"
 
 cat >"$fake_bin/hostname" <<'EOF'
-#!/bin/zsh
+#!/usr/bin/env zsh
 print -r -- "${TEST_HOSTNAME:-Jacks-MacBook-Pro.local}"
 EOF
 cat >"$fake_bin/uname" <<'EOF'
-#!/bin/zsh
+#!/usr/bin/env zsh
 if [[ "$1" == "-m" ]]; then
   print -r -- "${TEST_ARCH:-arm64}"
+elif [[ "$1" == "-s" && -n "$TEST_OS" ]]; then
+  print -r -- "$TEST_OS"
 else
-  /usr/bin/uname "$@"
+  "$TEST_REAL_UNAME" "$@"
 fi
 EOF
 # Setup schedules a launchd job. Recording the calls keeps the tests from changing the real schedule.
 launchctl_log="$test_dir/launchctl.log"
 cat >"$fake_bin/launchctl" <<EOF
-#!/bin/zsh
+#!/usr/bin/env zsh
 print -r -- "\$*" >>"$launchctl_log"
 EOF
 
@@ -47,7 +52,7 @@ EOF
 # Cloning needs network access and credentials, so a clone copies the stand-in instead.
 git_log="$test_dir/git.log"
 cat >"$fake_bin/git" <<EOF
-#!/bin/zsh
+#!/usr/bin/env zsh
 print -r -- "\$*" >>"$git_log"
 if [[ "\$1" != clone ]]; then
   exec /usr/bin/git "\$@"
@@ -115,7 +120,12 @@ assert_link() {
 
 assert_link "$test_home/.zshrc" "$repo_root/zshrc"
 assert_link "$test_home/.gitconfig" "$repo_root/gitconfig"
-assert_link "$test_home/.zshrc-local" "$repo_root/zshrc-local-mactop"
+if [[ "$system_name" == Linux ]]; then
+  personal_zshrc="$repo_root/zshrc-local-linux"
+else
+  personal_zshrc="$repo_root/zshrc-local-mactop"
+fi
+assert_link "$test_home/.zshrc-local" "$personal_zshrc"
 assert_link "$test_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 assert_link "$test_home/.cursor/commands" "$repo_root/cursor/commands"
 assert_link "$test_home/.config/herdr/config.toml" "$repo_root/herdr/config.toml"
@@ -142,8 +152,10 @@ assert_instructions() {
 <!-- Edit CLAUDE-base.md and CLAUDE-work.md (or CLAUDE-personal.md) in dotfiles repo -->
 
 EOF
-    cat "$overlay"
-    print
+    if [[ -n "$overlay" ]]; then
+      cat "$overlay"
+      print
+    fi
     cat "$repo_root/.claude/CLAUDE-base.md"
   } >"$expected"
 
@@ -207,7 +219,7 @@ assert_friction_tracker() {
   }
 }
 
-if (( $+commands[go] )); then
+if [[ "$system_name" == Darwin ]] && (( $+commands[go] )); then
   assert_friction_tracker "$test_home" "$test_home/.fx/sessions/v2"
   [[ "$(head -n 1 "$launchctl_log")" == "bootout gui/$UID/com.scubbo.friction-tracker" ]] || {
     print -u2 -- "Expected setup to unload the scheduled job before loading it"
@@ -276,7 +288,7 @@ assert_instructions "$repo_root/.claude/CLAUDE-work.md" \
   "$work_home/custom-codex/AGENTS.md" \
   "$work_home/custom-config/opencode/AGENTS.md"
 grep -Fxq user-claude-instructions "$work_home/.claude/CLAUDE.md"
-if (( $+commands[go] )); then
+if [[ "$system_name" == Darwin ]] && (( $+commands[go] )); then
   assert_friction_tracker "$work_home" "$work_home/custom-fx/sessions/v2"
   grep -Fxq "clone git@github.com:scubbo/friction-tracker.git $work_home/Code/friction-tracker" "$git_log" || {
     print -u2 -- "Expected setup to clone friction-tracker when there is no clone"
@@ -331,7 +343,7 @@ personal_output=$(HOME="$personal_home" PATH="$fake_bin:$PATH" TEST_HOSTNAME=Mac
   print -u2 -- "$personal_output"
   exit 1
 }
-assert_link "$personal_home/.zshrc-local" "$repo_root/zshrc-local-mactop"
+assert_link "$personal_home/.zshrc-local" "$personal_zshrc"
 assert_link "$personal_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 [[ ! -e "$personal_home/.vscode/extensions" && ! -L "$personal_home/.vscode/extensions" ]] || {
   print -u2 -- "Expected setup not to create an extension directory"
@@ -341,6 +353,34 @@ assert_instructions "$personal_home/Code/dotfiles-private/.claude/CLAUDE-persona
   "$personal_home/.fx/AGENTS.md" \
   "$personal_home/.codex/AGENTS.md" \
   "$personal_home/.config/opencode/AGENTS.md"
+
+linux_home="$test_dir/linux-home"
+mkdir -p "$linux_home/.config/dotfiles" "$linux_home/Code/dotfiles-private/.claude"
+print -r -- personal >"$linux_home/.config/dotfiles/machine-type"
+print -r -- overlay >"$linux_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+linux_output=$(HOME="$linux_home" PATH="$fake_bin:$PATH" TEST_OS=Linux TEST_ARCH=x86_64 \
+  "$repo_root/setup.sh" 2>&1) || {
+  print -u2 -- "$linux_output"
+  exit 1
+}
+assert_link "$linux_home/.zshrc-local" "$repo_root/zshrc-local-linux"
+assert_link "$linux_home/.gitconfig-local" "$repo_root/gitconfig-personal"
+
+if [[ "$system_name" == Linux ]]; then
+  startup_output=$(HOME="$linux_home" PATH="$fake_bin:$PATH" zsh -f -i -c '
+    source "$HOME/.zshrc"
+    [[ "$CDPATH" == "$HOME/Code:." && "$VISUAL" == vim ]] || exit 1
+    (( $+functions[compdef] )) || exit 1
+    [[ "$(bindkey "^I")" == *expand-or-complete* ]] || exit 1
+  ' 2>&1) || {
+    print -u2 -- "Linux shell startup failed: $startup_output"
+    exit 1
+  }
+  [[ "$startup_output" != *'command not found'* && "$startup_output" != *'no such file or directory'* ]] || {
+    print -u2 -- "Unexpected Linux shell startup errors: $startup_output"
+    exit 1
+  }
+fi
 
 pi_home="$test_dir/pi-home"
 mkdir -p "$pi_home/Code/dotfiles-private/.claude"
@@ -353,7 +393,12 @@ assert_link "$pi_home/.gitconfig-local" "$repo_root/gitconfig-personal"
 without_go_home="$test_dir/without-go-home"
 mkdir -p "$without_go_home/Code/dotfiles-private/.claude"
 print -r -- overlay >"$without_go_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
-without_go_output=$(HOME="$without_go_home" PATH="$fake_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
+no_go_bin="$test_dir/no-go-bin"
+mkdir -p "$no_go_bin"
+for utility in mkdir mv cat cmp ln date mktemp rm; do
+  ln -s "$(command -v "$utility")" "$no_go_bin/$utility"
+done
+without_go_output=$(HOME="$without_go_home" PATH="$fake_bin:$no_go_bin" \
   zsh "$repo_root/setup.sh" 2>&1) || {
   print -u2 -- "$without_go_output"
   exit 1
@@ -364,7 +409,7 @@ without_go_output=$(HOME="$without_go_home" PATH="$fake_bin:/usr/bin:/bin:/usr/s
   exit 1
 }
 
-if (( $+commands[go] )); then
+if [[ "$system_name" == Darwin ]] && (( $+commands[go] )); then
   without_access_home="$test_dir/without-access-home"
   mkdir -p "$without_access_home/Code/dotfiles-private/.claude"
   print -r -- overlay >"$without_access_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
@@ -406,5 +451,91 @@ fi
   print -u2 -- "Expected an unknown machine to fail before installing dotfiles"
   exit 1
 }
+
+missing_overlay_home="$test_dir/missing-overlay-home"
+mkdir -p "$missing_overlay_home/.config/dotfiles"
+print -r -- personal >"$missing_overlay_home/.config/dotfiles/machine-type"
+print -r -- original-zshrc >"$missing_overlay_home/.zshrc"
+print -r -- original-gitconfig >"$missing_overlay_home/.gitconfig"
+missing_output=$(HOME="$missing_overlay_home" PATH="$fake_bin:$PATH" \
+  "$repo_root/setup.sh" 2>&1) || {
+  print -u2 -- "Expected setup to succeed without the personal overlay: $missing_output"
+  exit 1
+}
+[[ "$missing_output" == *'WARNING: Personal agent instructions are missing:'* && \
+  "$missing_output" == *'BASE-ONLY'* && "$missing_output" == *'Dotfiles installed.'* ]] || {
+  print -u2 -- "Expected a prominent warning when the personal overlay is missing"
+  exit 1
+}
+assert_link "$missing_overlay_home/.zshrc" "$repo_root/zshrc"
+assert_link "$missing_overlay_home/.gitconfig" "$repo_root/gitconfig"
+assert_instructions "" "$missing_overlay_home/.fx/AGENTS.md" \
+  "$missing_overlay_home/.codex/AGENTS.md" "$missing_overlay_home/.config/opencode/AGENTS.md"
+missing_backup=$(find "$missing_overlay_home/.dotfiles-backups" -mindepth 1 -maxdepth 1 -type d -print -quit)
+grep -Fxq original-zshrc "$missing_backup/.zshrc"
+grep -Fxq original-gitconfig "$missing_backup/.gitconfig"
+
+missing_again=$(HOME="$missing_overlay_home" PATH="$fake_bin:$PATH" \
+  "$repo_root/setup.sh" 2>&1)
+[[ "$missing_again" == *'WARNING: Personal agent instructions are missing:'* && \
+  "$missing_again" != *'WARNING: Backed up'* ]] || {
+  print -u2 -- "Expected repeated base-only setup to warn without creating new backups"
+  exit 1
+}
+
+mkdir -p "$missing_overlay_home/Code/dotfiles-private/.claude"
+print -r -- added-personal-overlay >"$missing_overlay_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+added_output=$(HOME="$missing_overlay_home" PATH="$fake_bin:$PATH" \
+  "$repo_root/setup.sh" 2>&1)
+[[ "$added_output" != *'WARNING: Personal agent instructions are missing:'* ]] || {
+  print -u2 -- "Expected setup to use the newly added personal overlay"
+  exit 1
+}
+assert_instructions "$missing_overlay_home/Code/dotfiles-private/.claude/CLAUDE-personal.md" \
+  "$missing_overlay_home/.fx/AGENTS.md" "$missing_overlay_home/.codex/AGENTS.md" \
+  "$missing_overlay_home/.config/opencode/AGENTS.md"
+
+# An existing but invalid overlay is an error, not an absent optional file.
+invalid_overlay_home="$test_dir/invalid-overlay-home"
+mkdir -p "$invalid_overlay_home/.config/dotfiles" \
+  "$invalid_overlay_home/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+print -r -- personal >"$invalid_overlay_home/.config/dotfiles/machine-type"
+print -r -- original-zshrc >"$invalid_overlay_home/.zshrc"
+if invalid_overlay_output=$(HOME="$invalid_overlay_home" PATH="$fake_bin:$PATH" \
+  "$repo_root/setup.sh" 2>&1); then
+  print -u2 -- "Expected an invalid personal overlay to stop setup"
+  exit 1
+fi
+[[ "$invalid_overlay_output" == *'ERROR: Required agent instructions'* && \
+  ! -e "$invalid_overlay_home/.dotfiles-backups" && ! -e "$invalid_overlay_home/.zshrc-local" ]] || {
+  print -u2 -- "Expected an invalid personal overlay to fail before making changes"
+  exit 1
+}
+grep -Fxq original-zshrc "$invalid_overlay_home/.zshrc"
+
+# A missing late-stage source must also fail before the first link is installed.
+incomplete_repo="$test_dir/incomplete-repo"
+mkdir -p "$incomplete_repo"
+cp -R "$repo_root/setup.sh" "$repo_root/.claude" "$repo_root/cursor" \
+  "$repo_root/herdr" "$repo_root/rex" "$repo_root/envFolder" "$repo_root/bin" \
+  "$repo_root/zshrc-work-mactop" "$repo_root/gitconfig-professional" "$repo_root/zshrc" \
+  "$repo_root/gitignore_global" "$repo_root/gitconfig" "$repo_root/vimrc" \
+  "$repo_root/screenrc" "$repo_root/tmux.conf" "$incomplete_repo"
+rm "$incomplete_repo/rex/new-worktree-tab.sh"
+missing_source_home="$test_dir/missing-source-home"
+mkdir -p "$missing_source_home/.config/dotfiles"
+print -r -- work >"$missing_source_home/.config/dotfiles/machine-type"
+print -r -- original-zshrc >"$missing_source_home/.zshrc"
+if missing_output=$(HOME="$missing_source_home" PATH="$fake_bin:$PATH" \
+  "$incomplete_repo/setup.sh" 2>&1); then
+  print -u2 -- "Expected a missing source to stop setup"
+  exit 1
+fi
+[[ "$missing_output" == *'rex/new-worktree-tab.sh'* && ! -e "$missing_source_home/.dotfiles-backups" && \
+  ! -e "$missing_source_home/.zshrc-local" ]] || {
+  print -u2 -- "Expected a missing source to fail before making changes"
+  exit 1
+}
+grep -Fxq original-zshrc "$missing_source_home/.zshrc"
 
 print -- "Setup tests passed (machine selection, instructions, directory overrides, backups, idempotence, friction-tracker)."

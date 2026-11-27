@@ -1,0 +1,31 @@
+# Personal Linux settings. Keep the macOS-only paths and commands in
+# zshrc-local-mactop rather than loading them here.
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$HOME/.luarocks/bin:$PATH"
+export VAULT_ADDR="http://vault.avril"
+export CDPATH="$HOME/Code:."
+
+function gnb() {
+  git fetch dev
+  git checkout --track "dev/$1"
+}
+
+ks() {
+  kubectl exec -it "$(kubectl get pods -l "$1" -o jsonpath='{.items[0].metadata.name}')" -- sh
+}
+
+if (( $+commands[pyenv] )); then eval "$(pyenv init -)"; fi
+
+# Match the personal Mac's vi editing and familiar Emacs shortcuts.
+autoload edit-command-line; zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+export VISUAL=vim
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^A' beginning-of-line
+bindkey -M viins '^E' end-of-line
+bindkey -M viins '^R' history-incremental-search-backward
+bindkey -M viins '^U' kill-whole-line
+bindkey -v
+
+if [[ -f "$HOME/.env/zshrc" ]]; then
+  source "$HOME/.env/zshrc"
+fi

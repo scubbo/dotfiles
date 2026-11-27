@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
 set -e
 
@@ -66,6 +66,7 @@ ensure_file() {
 # Detect machine type
 current_hostname=$(hostname)
 arch_name=$(uname -m)
+os_name=$(uname -s)
 machine_type_file="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/machine-type"
 
 # A local role file keeps machine selection independent of hostnames.
@@ -91,6 +92,8 @@ case "$MACHINE_TYPE" in
   personal)
     if [[ "$arch_name" == "aarch64" ]]; then
       local_zshrc="$repo_root/zshrc-local-pi"
+    elif [[ "$os_name" == "Linux" ]]; then
+      local_zshrc="$repo_root/zshrc-local-linux"
     else
       local_zshrc="$repo_root/zshrc-local-mactop"
     fi
@@ -102,6 +105,57 @@ case "$MACHINE_TYPE" in
     exit 1
     ;;
 esac
+
+# Check all required inputs before changing anything in the home directory.
+agent_base="$repo_root/.claude/CLAUDE-base.md"
+if [[ "$MACHINE_TYPE" == "work" ]]; then
+  agent_overlay="$repo_root/.claude/CLAUDE-work.md"
+else
+  agent_overlay="$HOME/Code/dotfiles-private/.claude/CLAUDE-personal.md"
+  if [[ ! -e "$agent_overlay" && ! -L "$agent_overlay" ]]; then
+    print -u2 -- ""
+    print -u2 -- "****************************************************************"
+    print -u2 -- "WARNING: Personal agent instructions are missing: $agent_overlay"
+    print -u2 -- "Setup will install BASE-ONLY agent instructions, without the personal overlay."
+    print -u2 -- "Existing instruction files will be backed up if they differ."
+    print -u2 -- "To include the overlay, add the file and run setup again."
+    print -u2 -- "****************************************************************"
+    print -u2 -- ""
+    agent_overlay=""
+  fi
+fi
+
+instruction_files=("$agent_base")
+if [[ -n "$agent_overlay" ]]; then
+  instruction_files+=("$agent_overlay")
+fi
+for instruction_file in "${instruction_files[@]}"; do
+  if [[ ! -f "$instruction_file" || ! -r "$instruction_file" ]]; then
+    print -u2 -- "ERROR: Required agent instructions are missing or unreadable: $instruction_file"
+    exit 1
+  fi
+done
+
+required_sources=(
+  "$local_zshrc" "$local_gitconfig" "$repo_root/zshrc"
+  "$repo_root/gitignore_global" "$repo_root/gitconfig" "$repo_root/vimrc"
+  "$repo_root/envFolder" "$repo_root/bin" "$repo_root/screenrc" "$repo_root/tmux.conf"
+  "$repo_root/cursor/commands" "$repo_root/herdr/config.toml"
+  "$repo_root/herdr/new-worktree-tab.sh" "$repo_root/rex/init.lua"
+  "$repo_root/rex/new-worktree-tab.sh"
+)
+if [[ -d "$HOME/Library/Application Support/Sublime Text" ]]; then
+  required_sources+=("$repo_root/sublime-keymapping.json")
+fi
+if [[ -d "$HOME/Library/Application Support/Code/User" ]]; then
+  required_sources+=("$repo_root/VSCode/settings.json" "$repo_root/VSCode/keybindings.json")
+fi
+for source in "${required_sources[@]}"; do
+  if [[ ! -e "$source" ]]; then
+    print -u2 -- "ERROR: Cannot link missing source $source"
+    exit 1
+  fi
+done
 
 # Install dotfiles
 ensure_symlink "$local_zshrc" "$HOME/.zshrc-local"
@@ -116,19 +170,6 @@ ensure_symlink "$repo_root/screenrc" "$HOME/.screenrc"
 ensure_symlink "$repo_root/tmux.conf" "$HOME/.tmux.conf"
 
 # Generate user-level AGENTS.md files from base + machine-specific overlay
-agent_base="$repo_root/.claude/CLAUDE-base.md"
-
-if [[ "$MACHINE_TYPE" == "work" ]]; then
-  agent_overlay="$repo_root/.claude/CLAUDE-work.md"
-else
-  agent_overlay="$HOME/Code/dotfiles-private/.claude/CLAUDE-personal.md"
-  if [[ ! -f "$agent_overlay" ]]; then
-    print -u2 -- "ERROR: Personal machine detected but $agent_overlay not found."
-    print -u2 -- "Please clone dotfiles-private repo to $HOME/Code/dotfiles-private"
-    exit 1
-  fi
-fi
-
 generate_agent_instructions() {
   local target=$1
   local instructions_file
@@ -141,8 +182,10 @@ generate_agent_instructions() {
 <!-- Edit CLAUDE-base.md and CLAUDE-work.md (or CLAUDE-personal.md) in dotfiles repo -->
 
 EOF
-    cat "$agent_overlay"
-    print
+    if [[ -n "$agent_overlay" ]]; then
+      cat "$agent_overlay"
+      print
+    fi
     cat "$agent_base"
   } >"$instructions_file"
   ensure_file "$instructions_file" "$target"
@@ -249,10 +292,13 @@ EOF
     print -u2 -- "WARNING: Could not schedule $label. Run: launchctl bootstrap gui/$UID $plist"
 }
 
-if [[ "$(uname -s)" == "Darwin" ]] && (( $+commands[go] )); then
+if [[ "$os_name" == "Darwin" ]] && (( $+commands[go] )); then
   install_friction_tracker
 else
   print -- "Go or launchd is not available - friction-tracker not installed"
 fi
 
 print -- "Dotfiles installed."
+if [[ "$MACHINE_TYPE" == "personal" && -z "$agent_overlay" ]]; then
+  print -u2 -- "WARNING: Agent instructions contain only the base; the personal overlay was not found."
+fi

@@ -167,6 +167,7 @@
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2
     wl-clipboard
     xremap.gnome
+    zsh
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
