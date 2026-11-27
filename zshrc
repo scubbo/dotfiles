@@ -4,7 +4,11 @@
 # functions, options, key bindings, etc.
 #
 
+DOTFILES_USE_SOCKET_FIREWALL=0
 source ~/.zshrc-local
+
+# Make user-installed tools available to optional integrations below.
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 
 #set timezone
 TZ='America/Los_Angeles'; export TZ;
@@ -44,16 +48,19 @@ alias guom='git branch --set-upstream-to origin/mainline'
 alias sqp='git sqa; git push -f'
 alias vi='vim -O'
 alias cdup='cd `findup Config`'
-alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
-# https://apple.stackexchange.com/questions/110343/copy-last-command-in-terminal -
-# `echo "!!" | pbcopy` works on command line, but not from zshrc (copies literal "!!")
-alias copylast='fc -ln -1 | awk '{$1=$1}1' | pbcopy '
+if [[ "$OSTYPE" == darwin* ]]; then
+  alias lcm='git log -1 --format=%B | grep -v "^cr" | pbcopy'
+  alias copylast='fc -ln -1 | awk '\''{$1=$1}1'\'' | pbcopy '
+elif (( $+commands[wl-copy] )); then
+  alias lcm='git log -1 --format=%B | grep -v "^cr" | wl-copy'
+  alias copylast='fc -ln -1 | awk '\''{$1=$1}1'\'' | wl-copy '
+fi
 alias runlast='sudo chmod +x "$_"; $_'
 alias dr='docker compose run --rm'
-# Zed editor
-alias zed="open -a /Applications/Zed.app"
-# https://mackeeper.com/blog/flush-dns-cache-on-mac/ - though, note typo ("- flashcache")
-alias flush_cache="sudo dscacheutil -flushcache ;sudo killall -HUP mDNSResponder"
+if [[ "$OSTYPE" == darwin* ]]; then
+  alias zed="open -a /Applications/Zed.app"
+  alias flush_cache="sudo dscacheutil -flushcache ;sudo killall -HUP mDNSResponder"
+fi
 alias oc="opencode2"
 
 function sgrep() {
@@ -112,27 +119,32 @@ source $HOME/bin/indexed-funcs.zsh
 
 autoload -U compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /opt/homebrew/bin/terraform terraform
+if (( $+commands[terraform] )); then
+  complete -o nospace -C "${commands[terraform]}" terraform
+fi
 
-eval "$(fnm env --use-on-cd)"
+if (( $+commands[fnm] )); then
+  eval "$(fnm env --use-on-cd)"
+fi
 
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
 export AWS_PAGER="";
 
-source <(fzf --zsh)
+if (( $+commands[fzf] )); then
+  source <(fzf --zsh)
+fi
 
 ###
 # Path Alterations
 ###
-# Visual Studio Code
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
-# And bin from homeir
-export PATH=$HOME/bin:$PATH
+if [[ "$OSTYPE" == darwin* ]]; then
+  export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+fi
 
 # Must come after adding `$HOME/bin` to `$PATH`
 echo "\nHERE IS A PICTURE OF A CAT:\n"
 # http://stackoverflow.com/a/677212/1040915
-if hash cat-art 2>/dev/null; then
+if (( $+commands[cat-art] && $+commands[perl] )); then
   cat-art
 else
   echo "You do not have cat-art installed, you heathen!"
@@ -140,16 +152,11 @@ fi
 echo ""
 
 
-export PATH="$HOME/.local/bin:$PATH"
-
 # Must come after adding `$HOME/.local/bin` to `$PATH`
 source $HOME/bin/friction-tracker-reminder.zsh
 
-# opencode
-export PATH=/Users/jackjackson/.opencode/bin:$PATH
-
 # bun completions
-[ -s "/Users/jackjackson/.bun/_bun" ] && source "/Users/jackjackson/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
@@ -158,17 +165,18 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Added by Hades
 export PATH="$PATH:$HOME/.hades/bin"
 
-# openharness
-export PATH=/Users/jackjackson/.openharness/bin:$PATH
+export PATH="$HOME/.openharness/bin:$HOME/.opencode/bin:$PATH"
 
+if [[ "$DOTFILES_USE_SOCKET_FIREWALL" == 1 ]]; then
 # BEGIN: socket firewall aliases (managed by Iru)
 alias npm="sfw npm"
 alias pnpm="sfw pnpm"
 alias bun="sfw bun"
 # END: socket firewall aliases (managed by Iru)
-
-# opencode
-export PATH=/Users/scubbo/.opencode/bin:$PATH
+fi
+unset DOTFILES_USE_SOCKET_FIREWALL
 
 # Added by MDM Homebrew Postinstall Automation
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi

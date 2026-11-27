@@ -1,4 +1,15 @@
 # https://stackoverflow.com/a/49105399/1040915
+copy_to_clipboard() {
+    if (( $+commands[pbcopy] )); then
+        pbcopy
+    elif (( $+commands[wl-copy] )); then
+        wl-copy
+    else
+        print -u2 -- "No supported clipboard command found (pbcopy or wl-copy)"
+        return 1
+    fi
+}
+
 declare -a funcs=(tabname ff grhh grup gca psgrep dps token vif k dc kex)
 # AFAIK, there's no way to ensure that these "associative arrays"
 # (Dictionaries, basically) have key-sets that match `funcs` -
@@ -28,7 +39,7 @@ declare -A defs=(
     [gca]="git commit --amend"
     [psgrep]='ps aux | grep -i $1 | grep -v "grep"'
     [dps]="docker ps --format 'table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}'"
-    [token]=$'kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" | pbcopy'
+    [token]=$'kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" | copy_to_clipboard'
     # 0h 0h Oh!
     # TODO - it would be cool to be able to pass options to `find` (even _cooler_ to be able to arbitrarily pass options to either!)
     [vif]='find . -iname "*$1" -print0 | xargs -0 vi -O'

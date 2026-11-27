@@ -1,5 +1,6 @@
 export VAULT_ADDR=https://vault.legalzoom.com
 export BOUNDARY_ADDR=https://boundary.devops.prd.aws-01.legalzoom.com
+DOTFILES_USE_SOCKET_FIREWALL=1
 
 # https://stackoverflow.com/a/51939526
 export PATH="/usr/local/opt/python/libexec/bin:$PATH"

@@ -161,12 +161,14 @@
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
+    fzf
     git
     gnomeExtensions.appindicator
     gnomeExtensions.xremap
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2
     wl-clipboard
     xremap.gnome
+    zsh
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
