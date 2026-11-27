@@ -22,6 +22,10 @@ for profile in zshrc-local-linux zshrc-local-mactop zshrc-local-pi zshrc-work-ma
   fi
   output=$(HOME="$test_home" EXPECTED_ROLE="$expected" zsh -f -i -c '
     source "$HOME/.zshrc"
+    (( ! ${+DOTFILES_USE_SOCKET_FIREWALL} )) || {
+      print -u2 -- "Expected the shell configuration flag to be removed after startup"
+      exit 1
+    }
     for command_name in npm pnpm bun; do
       if [[ "$EXPECTED_ROLE" == work ]]; then
         [[ "${aliases[$command_name]-}" == "sfw $command_name" ]] || {

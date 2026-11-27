@@ -174,6 +174,7 @@ alias pnpm="sfw pnpm"
 alias bun="sfw bun"
 # END: socket firewall aliases (managed by Iru)
 fi
+unset DOTFILES_USE_SOCKET_FIREWALL
 
 # Added by MDM Homebrew Postinstall Automation
 if [[ -x /opt/homebrew/bin/brew ]]; then
