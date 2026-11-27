@@ -255,4 +255,7 @@ else
   print -- "Go or launchd is not available - friction-tracker not installed"
 fi
 
+source "$repo_root/kubernetes-setup.zsh"
+setup_kubernetes
+
 print -- "Dotfiles installed."
