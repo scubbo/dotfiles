@@ -144,6 +144,8 @@ required_sources=(
   "$repo_root/herdr/new-worktree-tab.sh" "$repo_root/rex/init.lua"
   "$repo_root/rex/new-worktree-tab.sh"
   "$repo_root/skills/issue-tracking/SKILL.md"
+  "$repo_root/kubernetes-setup.zsh"
+  "$repo_root/bin/homelab-kubeconfig"
 )
 if [[ -d "$HOME/Library/Application Support/Sublime Text" ]]; then
   required_sources+=("$repo_root/sublime-keymapping.json")
@@ -303,6 +305,9 @@ if [[ "$os_name" == "Darwin" ]] && (( $+commands[go] )); then
 else
   print -- "Go or launchd is not available - friction-tracker not installed"
 fi
+
+source "$repo_root/kubernetes-setup.zsh"
+setup_kubernetes
 
 print -- "Dotfiles installed."
 if [[ "$MACHINE_TYPE" == "personal" && -z "$agent_overlay" ]]; then

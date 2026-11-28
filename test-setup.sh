@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-unset FX_HOME CODEX_HOME XDG_CONFIG_HOME TEST_HOSTNAME TEST_ARCH TEST_OS
+unset FX_HOME CODEX_HOME XDG_CONFIG_HOME KUBECONFIG TEST_HOSTNAME TEST_ARCH TEST_OS
 
 export TEST_REAL_UNAME="$(command -v uname)"
 system_name=$("$TEST_REAL_UNAME" -s)
@@ -111,7 +111,11 @@ print -r -- user-extension >"$test_home/.vscode/extensions/user-extension.txt"
 cp -R "$stand_in_source" "$test_home/Code/friction-tracker"
 print -r -- work-in-progress >"$test_home/Code/friction-tracker/notes.txt"
 
-output=$(HOME="$test_home" PATH="$fake_bin:$PATH" zsh "$repo_root/setup.sh" 2>&1)
+output=$(HOME="$test_home" PATH="$fake_bin:$PATH" zsh "$repo_root/setup.sh" </dev/null 2>&1)
+[[ "$output" == *'Kubernetes preference not set'* && ! -e "$test_home/.kube/config" ]] || {
+  print -u2 -- "Expected non-interactive setup to leave Kubernetes credentials untouched"
+  exit 1
+}
 [[ "$output" == *'WARNING: Backed up'* ]] || {
   print -u2 -- "Expected conflict backups to produce a warning"
   exit 1
@@ -538,6 +542,7 @@ incomplete_repo="$test_dir/incomplete-repo"
 mkdir -p "$incomplete_repo"
 cp -R "$repo_root/setup.sh" "$repo_root/.claude" "$repo_root/cursor" \
   "$repo_root/herdr" "$repo_root/rex" "$repo_root/envFolder" "$repo_root/bin" "$repo_root/skills" \
+  "$repo_root/kubernetes-setup.zsh" \
   "$repo_root/zshrc-work-mactop" "$repo_root/gitconfig-professional" "$repo_root/zshrc" \
   "$repo_root/gitignore_global" "$repo_root/gitconfig" "$repo_root/vimrc" \
   "$repo_root/screenrc" "$repo_root/tmux.conf" "$incomplete_repo"
@@ -568,6 +573,34 @@ fi
 [[ "$missing_output" == *'skills/issue-tracking/SKILL.md'* && \
   ! -e "$missing_source_home/.dotfiles-backups" && ! -e "$missing_source_home/.zshrc-local" ]] || {
   print -u2 -- "Expected a missing shared skill to fail before making changes"
+  exit 1
+}
+grep -Fxq original-zshrc "$missing_source_home/.zshrc"
+
+mv "$test_dir/removed-skill.md" "$incomplete_repo/skills/issue-tracking/SKILL.md"
+mv "$incomplete_repo/bin/homelab-kubeconfig" "$test_dir/removed-kube-helper"
+if missing_output=$(HOME="$missing_source_home" PATH="$fake_bin:$PATH" \
+  "$incomplete_repo/setup.sh" 2>&1); then
+  print -u2 -- "Expected a missing Kubernetes helper to stop setup"
+  exit 1
+fi
+[[ "$missing_output" == *'bin/homelab-kubeconfig'* && \
+  ! -e "$missing_source_home/.dotfiles-backups" && ! -e "$missing_source_home/.zshrc-local" ]] || {
+  print -u2 -- "Expected a missing Kubernetes helper to fail before making changes"
+  exit 1
+}
+grep -Fxq original-zshrc "$missing_source_home/.zshrc"
+
+mv "$test_dir/removed-kube-helper" "$incomplete_repo/bin/homelab-kubeconfig"
+mv "$incomplete_repo/kubernetes-setup.zsh" "$test_dir/removed-kubernetes-setup.zsh"
+if missing_output=$(HOME="$missing_source_home" PATH="$fake_bin:$PATH" \
+  "$incomplete_repo/setup.sh" 2>&1); then
+  print -u2 -- "Expected missing Kubernetes setup to stop setup"
+  exit 1
+fi
+[[ "$missing_output" == *'kubernetes-setup.zsh'* && \
+  ! -e "$missing_source_home/.dotfiles-backups" && ! -e "$missing_source_home/.zshrc-local" ]] || {
+  print -u2 -- "Expected missing Kubernetes setup to fail before making changes"
   exit 1
 }
 grep -Fxq original-zshrc "$missing_source_home/.zshrc"
