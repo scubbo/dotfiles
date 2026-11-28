@@ -91,7 +91,6 @@ kubernetes_install_config() {
 
 setup_kubernetes() {
   local preference_file="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/kubernetes-access"
-  local source
 
   if [[ ! -f "$preference_file" && ! -t 0 ]]; then
     print -- "Kubernetes preference not set; run setup.sh interactively to configure it."
@@ -100,7 +99,7 @@ setup_kubernetes() {
   kubernetes_preference || return 0
 
   if (( ! $+commands[kubectl] )); then
-    print -u2 -- "kubectl is not installed. Install it for your OS (on NixOS, add kubectl to your packages), then rerun setup.sh."
+    print -u2 -- "kubectl is not installed. Install it for your OS before running homelab-kubeconfig."
   fi
   if [[ -n "${KUBECONFIG:-}" ]]; then
     print -- "KUBECONFIG is set; setup will not modify it. Check your active configuration with kubectl config current-context."
@@ -112,25 +111,12 @@ setup_kubernetes() {
   fi
 
   cat <<'EOF'
-No ~/.kube/config found. Obtain a kubeconfig through a trusted, encrypted channel.
-Prefer a restricted read-only credential. The k3s server's /etc/rancher/k3s/k3s.yaml
-is CLUSTER ADMIN, not read-only; use it only if you intend to grant full access.
-To use that admin shortcut, run ~/bin/homelab-kubeconfig separately after setup.
-See KUBERNETES.md for the existing homelab procedure and security precautions.
+No ~/.kube/config found. To fetch and install epsilon's shared CLUSTER-ADMIN
+credential, run this separately after setup:
+
+  ~/bin/homelab-kubeconfig
+
+Prefer per-user non-admin credentials when available. See KUBERNETES.md for
+security precautions.
 EOF
-  if [[ ! -t 0 ]]; then
-    print -- "Run setup.sh interactively after obtaining the kubeconfig."
-    return
-  fi
-  print -n -- "Path to the local kubeconfig to install (blank to defer): "
-  if ! read -r source || [[ -z "$source" ]]; then
-    print -- "Kubernetes configuration deferred; rerun setup.sh when ready."
-    return
-  fi
-  if kubernetes_install_config "$source"; then
-    print -- "Verify with: kubectl -n arr-stack get pods"
-    print -- "Once verified, remove any temporary credential copies."
-  else
-    print -u2 -- "Kubernetes configuration not installed; rerun setup.sh when ready."
-  fi
 }

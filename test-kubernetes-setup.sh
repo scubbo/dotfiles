@@ -82,6 +82,26 @@ setup_kubernetes </dev/null >"$test_dir/output"
 grep -q 'left unchanged' "$test_dir/output"
 
 rm "$HOME/.kube/config"
+terminal_command='source "$KUBE_SETUP"; setup_kubernetes'
+if [[ "$OSTYPE" == darwin* ]]; then
+  output=$(printf '\n' | KUBE_SETUP="$repo_root/kubernetes-setup.zsh" \
+    script -q /dev/null zsh -f -c "$terminal_command" 2>&1) || {
+    print -u2 -- "Interactive Kubernetes setup failed: $output"
+    exit 1
+  }
+else
+  output=$(printf '\n' | KUBE_SETUP="$repo_root/kubernetes-setup.zsh" \
+    script -q -e -c "zsh -f -c ${(q)terminal_command}" /dev/null 2>&1) || {
+    print -u2 -- "Interactive Kubernetes setup failed: $output"
+    exit 1
+  }
+fi
+[[ "$output" == *'~/bin/homelab-kubeconfig'* && "$output" != *'Path to the local kubeconfig'* && \
+  "$output" != *'Run setup.sh interactively after obtaining'* && ! -e "$HOME/.kube/config" ]] || {
+  print -u2 -- "Expected a separate fetch command without a kubeconfig path prompt: $output"
+  exit 1
+}
+
 kubernetes_install_config "$test_dir/source" epsilon
 [[ "$(kubectl --kubeconfig "$HOME/.kube/config" config view --minify -o 'jsonpath={.clusters[0].cluster.server}')" == https://epsilon:6443 ]]
 rm "$HOME/.kube/config"

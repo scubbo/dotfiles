@@ -2,7 +2,7 @@
 
 `setup.sh` asks whether this machine should have homelab access. It saves the answer in `${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/kubernetes-access`; non-interactive setup does not make a choice. Change the file to `yes` or `no` to change the preference.
 
-When access is enabled, setup can install a trusted local kubeconfig at `~/.kube/config`. It embeds referenced certificates and keys, preserves the supplied server endpoint, and creates the file with mode `600`. It does not overwrite an existing file or follow a `KUBECONFIG` override. A kubeconfig can contain private keys, tokens, and executable authentication plugins: use only a trusted file and never commit it or paste it into chat.
+When access is enabled and no kubeconfig exists, setup prints the command to fetch credentials; it does not fetch them itself. It leaves an existing file or `KUBECONFIG` override unchanged. A kubeconfig can contain private keys, tokens, and executable authentication plugins: use only a trusted file and never commit it or paste it into chat.
 
 ## Explicit admin shortcut
 
@@ -14,7 +14,7 @@ To copy the admin config, run this separately in an interactive terminal:
 ~/bin/homelab-kubeconfig
 ```
 
-The helper requires SSH access to `scubbo@epsilon.avril`, permission to run `sudo` there, and local `kubectl`. Verify the SSH host key through a trusted channel. It asks for explicit confirmation, copies the credential over SSH, and installs it only if no kubeconfig already exists and `KUBECONFIG` is unset. For this server-local config, it changes `https://127.0.0.1:6443` to `https://epsilon:6443`.
+The helper requires SSH access to `scubbo@epsilon.avril`, permission to run `sudo` there, and local `kubectl`. Verify the SSH host key through a trusted channel. It asks for explicit confirmation, copies the credential over SSH, and installs it at `~/.kube/config` with mode `600` only if no kubeconfig already exists and `KUBECONFIG` is unset. It embeds referenced certificates and keys; for this server-local config, it changes `https://127.0.0.1:6443` to `https://epsilon:6443`.
 
 The helper makes private temporary copies locally and on epsilon and attempts to remove them on exit or interruption. If cleanup fails, it prints their locations; remove them promptly. A forced termination or network outage can prevent cleanup. It does not rotate certificates, change Kubernetes resources, or contact the cluster API.
 
