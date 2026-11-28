@@ -145,6 +145,7 @@ required_sources=(
   "$repo_root/rex/new-worktree-tab.sh"
   "$repo_root/skills/issue-tracking/SKILL.md"
   "$repo_root/kubernetes-setup.zsh"
+  "$repo_root/bin/homelab-kubeconfig"
 )
 if [[ -d "$HOME/Library/Application Support/Sublime Text" ]]; then
   required_sources+=("$repo_root/sublime-keymapping.json")

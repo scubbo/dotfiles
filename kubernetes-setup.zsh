@@ -33,9 +33,14 @@ kubernetes_preference() {
 
 kubernetes_install_config() {
   local source=$1
+  local origin=${2:-supplied}
   local target="$HOME/.kube/config"
   local temp cluster server
 
+  if [[ "$origin" != supplied && "$origin" != epsilon ]]; then
+    print -u2 -- "Invalid kubeconfig source."
+    return 1
+  fi
   if [[ ! -f "$source" || ! -r "$source" ]]; then
     print -u2 -- "Cannot read kubeconfig: $source"
     return 1
@@ -59,8 +64,7 @@ kubernetes_install_config() {
     rm -f "$temp"
     return 1
   fi
-  # k3s's server-local admin config uses loopback. Other kubeconfigs, including
-  # restricted ones and those already using a remote endpoint, are left alone.
+  # The server-local k3s config uses loopback, which is unreachable from a workstation.
   if ! cluster=$(kubectl --kubeconfig "$temp" config view --minify -o 'jsonpath={.contexts[0].context.cluster}' 2>/dev/null) ||
      ! server=$(kubectl --kubeconfig "$temp" config view --minify -o 'jsonpath={.clusters[0].cluster.server}' 2>/dev/null) ||
      [[ -z "$cluster" || -z "$server" ]]; then
@@ -68,7 +72,7 @@ kubernetes_install_config() {
     rm -f "$temp"
     return 1
   fi
-  if [[ "$server" == "https://127.0.0.1:6443" ]]; then
+  if [[ "$origin" == epsilon && "$server" == "https://127.0.0.1:6443" ]]; then
     if ! kubectl --kubeconfig "$temp" config set-cluster "$cluster" --server=https://epsilon:6443 >/dev/null 2>&1; then
       print -u2 -- "Could not set the Kubernetes API endpoint."
       rm -f "$temp"
@@ -111,6 +115,7 @@ setup_kubernetes() {
 No ~/.kube/config found. Obtain a kubeconfig through a trusted, encrypted channel.
 Prefer a restricted read-only credential. The k3s server's /etc/rancher/k3s/k3s.yaml
 is CLUSTER ADMIN, not read-only; use it only if you intend to grant full access.
+To use that admin shortcut, run ~/bin/homelab-kubeconfig separately after setup.
 See KUBERNETES.md for the existing homelab procedure and security precautions.
 EOF
   if [[ ! -t 0 ]]; then

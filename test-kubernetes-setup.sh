@@ -57,7 +57,7 @@ users:
 EOF
 kubernetes_install_config "$test_dir/source"
 [[ -f "$HOME/.kube/config" && ! -L "$HOME/.kube/config" ]]
-[[ "$(kubectl --kubeconfig "$HOME/.kube/config" config view --minify -o 'jsonpath={.clusters[0].cluster.server}')" == https://epsilon:6443 ]]
+[[ "$(kubectl --kubeconfig "$HOME/.kube/config" config view --minify -o 'jsonpath={.clusters[0].cluster.server}')" == https://127.0.0.1:6443 ]]
 [[ "$(kubectl --kubeconfig "$test_dir/source" config view --minify -o 'jsonpath={.clusters[0].cluster.server}')" == https://127.0.0.1:6443 ]]
 zmodload zsh/stat
 zstat -A file_mode +mode "$HOME/.kube/config"
@@ -81,6 +81,9 @@ unset KUBECONFIG
 setup_kubernetes </dev/null >"$test_dir/output"
 grep -q 'left unchanged' "$test_dir/output"
 
+rm "$HOME/.kube/config"
+kubernetes_install_config "$test_dir/source" epsilon
+[[ "$(kubectl --kubeconfig "$HOME/.kube/config" config view --minify -o 'jsonpath={.clusters[0].cluster.server}')" == https://epsilon:6443 ]]
 rm "$HOME/.kube/config"
 kubectl --kubeconfig "$test_dir/source" config set-cluster homelab --server=https://remote.example:6443 >/dev/null
 print -r -- certificate-fixture >"$test_dir/ca.crt"
