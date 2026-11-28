@@ -17,10 +17,10 @@ You are a review coordinator orchestrating a 2-phase parallel code review. Your 
    - Review those specific files/directories
 
 3. **If `$ARGUMENTS` is empty or contains only flags** (e.g., `--security-focus`):
-   - Review the current branch's changes compared to `main`
-   - Run: `git diff main...HEAD --name-only` to get the list of changed files
-   - Run: `git diff main...HEAD` to get the full diff for context
-   - If no changes exist (branch is main or no commits), inform the user and ask for a target
+   - Use the ref from `--base=<ref>` if provided. Otherwise, resolve the repository default with `git def` and use its `refs/remotes/origin/` tracking ref as the base.
+   - If the default cannot be resolved, inform the user and ask for a base instead of guessing. `origin/HEAD` is a local cache and may need refreshing after a remote default-branch change.
+   - Run `git diff "${base_ref}...HEAD" --name-only` to get the list of changed files and `git diff "${base_ref}...HEAD"` for the full diff.
+   - If no changes exist, inform the user and ask for a target.
 
 4. **If `$ARGUMENTS` contains a branch name or commit range** (e.g., `feature/auth`, `abc123..def456`):
    - Review the diff for that range
@@ -28,9 +28,11 @@ You are a review coordinator orchestrating a 2-phase parallel code review. Your 
 **Store the resolved target** for use in all review phases.
 
 ```bash
-# Default behavior when no files specified:
-git diff main...HEAD --name-only  # List of files to review
-git diff main...HEAD              # Full diff for context
+# Default behavior when no files or explicit base are specified:
+default_branch=$(git def) || exit 1
+base_ref="refs/remotes/origin/$default_branch"
+git diff "${base_ref}...HEAD" --name-only
+git diff "${base_ref}...HEAD"
 ```
 
 ## Arguments
@@ -47,7 +49,7 @@ Parse these flags from the arguments if present:
 | `--performance-critical` | Emphasize performance bottlenecks, include profiling recommendations |
 | `--tdd-review` | Include TDD compliance verification in testing phase |
 | `--strict-mode` | Fail the review if any P0 (Critical) issues found |
-| `--base=<ref>` | Compare against a different base (default: `main`). E.g., `--base=develop` |
+| `--base=<ref>` | Compare against a different base (default: the remote-tracking default branch). E.g., `--base=develop` |
 
 ## Review Phases
 
@@ -323,7 +325,7 @@ After both phases complete, synthesize findings into a prioritized report:
 ```markdown
 # Full Code Review Report
 
-**Target:** <resolved target - files or "Branch changes vs main">
+**Target:** <resolved target - files or branch changes against the resolved base>
 **Date:** <timestamp>
 **Flags:** <list active flags>
 
@@ -407,7 +409,7 @@ The review is successful when:
 ## Getting Started
 
 1. **Resolve the target** using the Target Resolution logic above
-2. If reviewing branch changes, run `git diff main...HEAD --name-only` to identify files
+2. If reviewing branch changes, use the resolved base or range to identify files
 3. Spawn all 4 Phase 1 agents in a SINGLE message
 4. Collect Phase 1 findings
 5. Spawn all 4 Phase 2 agents in a SINGLE message, passing Phase 1 context
@@ -417,10 +419,9 @@ The review is successful when:
 ### Example Invocations
 
 ```bash
-/full-review                           # Review current branch vs main
-/full-review --security-focus          # Review branch vs main, prioritize security
+/full-review                           # Review current branch against the default branch
+/full-review --security-focus          # Review against the default branch, prioritize security
 /full-review src/api/                  # Review specific directory
-/full-review --base=develop            # Review branch vs develop instead of main
+/full-review --base=develop            # Review branch against develop
 /full-review src/ --strict-mode        # Review src/ and fail on P0 issues
 ```
-
