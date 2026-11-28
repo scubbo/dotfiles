@@ -35,6 +35,9 @@ def main():
     def live_conversations():
         return {session["id"] for session in fx("sessions", "--live", "--all", "--json")["sessions"]}
 
+    def titles():
+        return {session["id"]: session["title"] for session in fx("sessions", "--all", "--json")["sessions"]}
+
     def history(conversation_id):
         return fx("session", "--id", conversation_id, "--json")["history"]
 
@@ -83,6 +86,11 @@ def main():
         assert history(source_id), "The seeded conversation has no history"
         assert history(fork_id) == history(source_id)
         print("PASS: the fork starts with the source conversation's history")
+
+        saved = titles()
+        assert saved[source_id], "The seeded conversation has no title"
+        assert saved[fork_id] == saved[source_id] + " (fork)", saved
+        print("PASS: fx lists the copy as a fork of the source conversation")
 
         shell = rex("window", "new", "-s", session_id, "not-an-agent", "-c", str(workspace), "--json",
                     "--shell=none", "--", "/bin/bash", "--noprofile", "--norc")
