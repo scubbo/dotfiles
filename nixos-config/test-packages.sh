@@ -10,4 +10,11 @@ if [[ "$has_fzf" != true ]]; then
   exit 1
 fi
 
+has_kubectl=$(nix eval --json "$config_dir#nixosConfigurations.phi.config.environment.systemPackages" \
+  --apply 'packages: builtins.any (package: (package.pname or "") == "kubectl") packages')
+if [[ "$has_kubectl" != true ]]; then
+  printf '%s\n' "Expected kubectl in phi's system packages" >&2
+  exit 1
+fi
+
 printf '%s\n' "NixOS package tests passed."

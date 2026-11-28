@@ -165,6 +165,7 @@
     git
     gnomeExtensions.appindicator
     gnomeExtensions.xremap
+    kubectl
     llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode2
     wl-clipboard
     xremap.gnome
