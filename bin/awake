@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+usage() {
+  echo "Usage: awake [--reason REASON] [DURATION]" >&2
+  echo "Duration: whole minutes (m or min), hours (h or hr), or a number (1-9 hours, 10+ minutes)." >&2
+}
+
+reason="Keep awake"
+duration=""
+duration_given=false
+
+while (($#)); do
+  case "$1" in
+    --reason)
+      if (($# < 2)) || [[ -z $2 ]]; then
+        usage
+        exit 1
+      fi
+      reason=$2
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    -*)
+      usage
+      exit 1
+      ;;
+    *)
+      if "$duration_given"; then
+        usage
+        exit 1
+      fi
+      duration=$1
+      duration_given=true
+      shift
+      ;;
+  esac
+done
+
+if ! "$duration_given"; then
+  printf 'How long should the machine stay awake? ' >&2
+  if ! IFS= read -r duration; then
+    echo >&2
+    usage
+    exit 1
+  fi
+fi
+
+if [[ ! $duration =~ ^([0-9]+)(m|min|h|hr)?$ ]]; then
+  usage
+  exit 1
+fi
+
+amount=${BASH_REMATCH[1]}
+unit=${BASH_REMATCH[2]}
+while [[ ${#amount} -gt 1 && ${amount:0:1} == 0 ]]; do
+  amount=${amount:1}
+done
+if [[ $amount == 0 ]]; then
+  usage
+  exit 1
+fi
+
+case "$unit" in
+  m|min) unit=m ;;
+  h|hr) unit=h ;;
+  "")
+    if [[ ${#amount} -eq 1 ]]; then
+      unit=h
+    else
+      unit=m
+    fi
+    ;;
+esac
+
+exec gnome-session-inhibit --app-id awake --reason "$reason" \
+  --inhibit idle --inhibit suspend sleep "$amount$unit"
