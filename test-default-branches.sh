@@ -74,6 +74,39 @@ for default_branch in master main release/stable; do
     exit 1
   }
 
+  git -C "$checkout" branch preserve-stale
+  git -C "$checkout" update-ref refs/remotes/origin/stale \
+    "$(git -C "$checkout" rev-parse "refs/remotes/origin/$default_branch")"
+  git -C "$checkout" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/stale
+  if output=$(git -C "$checkout" clean-branches 2>&1); then
+    print -u2 -- "Expected cleanup to fail when origin/HEAD is stale"
+    exit 1
+  fi
+  [[ "$output" == *'origin/HEAD does not match the remote default'* ]] || {
+    print -u2 -- "Expected a stale origin/HEAD error: $output"
+    exit 1
+  }
+  git -C "$checkout" show-ref --verify --quiet refs/heads/preserve-stale || {
+    print -u2 -- "Stale origin/HEAD must not delete branches"
+    exit 1
+  }
+
+  git -C "$checkout" symbolic-ref refs/remotes/origin/HEAD "refs/remotes/origin/$default_branch"
+  git -C "$checkout" remote set-url origin "$case_dir/unavailable.git"
+  if output=$(git -C "$checkout" clean-branches 2>&1); then
+    print -u2 -- "Expected cleanup to fail when the remote is unavailable"
+    exit 1
+  fi
+  [[ "$output" == *'Cannot verify the remote default branch'* ]] || {
+    print -u2 -- "Expected an unavailable remote error: $output"
+    exit 1
+  }
+  git -C "$checkout" show-ref --verify --quiet refs/heads/preserve-stale || {
+    print -u2 -- "An unavailable remote must not delete branches"
+    exit 1
+  }
+  git -C "$checkout" remote set-url origin "$remote"
+
   git -C "$checkout" branch preserve-missing
   git -C "$checkout" symbolic-ref --delete refs/remotes/origin/HEAD
   for action in def clean-branches nb; do
