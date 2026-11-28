@@ -7,3 +7,4 @@
 - [ ] Replace the shared k3s administrator kubeconfig shortcut with per-user, non-admin Kubernetes credentials; coordinate the access policy with `homelab-configuration`.
 - [ ] Verify `homelab-kubeconfig` cleanup against epsilon on an authorized machine without logging credentials. A live run installed working credentials, but remote cleanup failed because SSH batch mode blocked the password prompt; the fix allowing prompts needs a live check.
 - [x] Show the explicit credential-fetch command instead of prompting for a local kubeconfig during setup. Covered by `test-kubernetes-setup.sh`.
+- [x] Make `~/bin` and `~/.local/bin` available in phi's shell PATH. Covered by `test-user-path.sh`.

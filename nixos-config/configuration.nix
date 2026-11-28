@@ -158,6 +158,9 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  environment.homeBinInPath = true;
+  environment.localBinInPath = true;
+
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
