@@ -5,3 +5,4 @@
 - [x] Protect the actual default branch in `git clean-branches` and resolve repository defaults in `git nb` and `git def`. Covered by `test-default-branches.sh`.
 - [x] Stop the work `plf` alias before installing, staging, committing, or pushing when its fetch or merge fails. Covered by `test-work-plf.sh`.
 - [ ] Replace the shared k3s administrator kubeconfig shortcut with per-user, non-admin Kubernetes credentials; coordinate the access policy with `homelab-configuration`.
+- [ ] Verify `homelab-kubeconfig` end-to-end against epsilon on an authorized machine, including sudo and temporary-file cleanup, without logging credentials.

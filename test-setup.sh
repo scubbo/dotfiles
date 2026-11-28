@@ -591,4 +591,18 @@ fi
 }
 grep -Fxq original-zshrc "$missing_source_home/.zshrc"
 
+mv "$test_dir/removed-kube-helper" "$incomplete_repo/bin/homelab-kubeconfig"
+mv "$incomplete_repo/kubernetes-setup.zsh" "$test_dir/removed-kubernetes-setup.zsh"
+if missing_output=$(HOME="$missing_source_home" PATH="$fake_bin:$PATH" \
+  "$incomplete_repo/setup.sh" 2>&1); then
+  print -u2 -- "Expected missing Kubernetes setup to stop setup"
+  exit 1
+fi
+[[ "$missing_output" == *'kubernetes-setup.zsh'* && \
+  ! -e "$missing_source_home/.dotfiles-backups" && ! -e "$missing_source_home/.zshrc-local" ]] || {
+  print -u2 -- "Expected missing Kubernetes setup to fail before making changes"
+  exit 1
+}
+grep -Fxq original-zshrc "$missing_source_home/.zshrc"
+
 print -- "Setup tests passed (machine selection, instructions, directory overrides, backups, idempotence, friction-tracker)."
