@@ -10,6 +10,17 @@ mkdir -p "$test_dir/home" "$test_dir/bin"
 ln -s "$(command -v zsh)" "$test_dir/bin/zsh"
 unset KUBECONFIG
 
+cleanup_line=$(grep -F '&& ! ssh -T ' "$helper")
+[[ "$cleanup_line" == *'-o BatchMode=no'* ]] || {
+  print -u2 -- "Expected remote cleanup to permit SSH password prompts"
+  exit 1
+}
+ssh_config=$(ssh -G -F /dev/null -T -o BatchMode=no -o ConnectTimeout=10 example.invalid)
+[[ "$ssh_config" == *$'\nbatchmode no\n'* ]] || {
+  print -u2 -- "Expected SSH cleanup options to allow interactive authentication"
+  exit 1
+}
+
 output=$(HOME="$test_dir/home" PATH="$test_dir/bin" "$helper" --help 2>&1) || {
   print -u2 -- "Expected help to work without network tools: $output"
   exit 1
