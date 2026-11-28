@@ -7,7 +7,7 @@
     # Log my commits
     mine = !git log --author=$(git config user.email) --oneline
     co = checkout
-    nb = "!f() { default_branch=$(git def) || return; git checkout \"$default_branch\" && git pull && git checkout -b \"$@\"; }; f"
+    nb = "!f() { git fetch origin && git remote set-head origin --auto || return; default_branch=$(git def) || return; git checkout \"$default_branch\" && git pull && git checkout -b \"$@\"; }; f"
     # "SQuash"
     sq = commit --amend --no-edit
     # "SQuash Amend"

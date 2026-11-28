@@ -61,6 +61,9 @@ for default_branch in master main release/stable; do
     fi
   done
 
+  git -C "$checkout" update-ref refs/remotes/origin/stale \
+    "$(git -C "$checkout" rev-parse "refs/remotes/origin/$default_branch")"
+  git -C "$checkout" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/stale
   output=$(git -C "$checkout" nb next-branch 2>&1) || {
     print -u2 -- "Creating a branch from $default_branch failed: $output"
     exit 1
@@ -105,11 +108,19 @@ for default_branch in master main release/stable; do
     print -u2 -- "An unavailable remote must not delete branches"
     exit 1
   }
+  if output=$(git -C "$checkout" nb offline-branch 2>&1); then
+    print -u2 -- "Expected nb to fail when the remote is unavailable"
+    exit 1
+  fi
+  [[ "$(git -C "$checkout" branch --show-current)" == next-branch ]] || {
+    print -u2 -- "An unavailable remote must not change the current branch"
+    exit 1
+  }
   git -C "$checkout" remote set-url origin "$remote"
 
   git -C "$checkout" branch preserve-missing
   git -C "$checkout" symbolic-ref --delete refs/remotes/origin/HEAD
-  for action in def clean-branches nb; do
+  for action in def clean-branches; do
     if output=$(git -C "$checkout" "$action" 2>&1); then
       print -u2 -- "Expected $action to fail without a default branch"
       exit 1
